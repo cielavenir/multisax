@@ -1,6 +1,4 @@
-Copyright (c) 2013, cielavenir
-
-All rights reserved.
+- Copyright (c) 2013, T. Yamada
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met: 
@@ -22,9 +20,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-A part of Nokogiri source code is cited to convert Nokogiri::XML::SAX::Document into module.
+- A part of Nokogiri source code is cited to convert Nokogiri::XML::SAX::Document into module.
 
-Copyright © 2008 - 2012: Aaron Patterson, Mike Dalessio, Charles Nutter, Sergio Arbeo, Patrick Mahoney, Yoko Harada
+- Copyright © 2008 - 2012: Aaron Patterson, Mike Dalessio, Charles Nutter, Sergio Arbeo, Patrick Mahoney, Yoko Harada
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ‘Software’), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -34,7 +32,7 @@ THE SOFTWARE IS PROVIDED ‘AS IS’, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 Note: MultiSAX shouldn't load any copyleft libraries.
 
-Ruby (REXML): 2-clause BSD License (or Artistic License)
-Nokogiri: MIT License
-libxml-ruby: MIT License
-Ox: 3-clause BSD License
+- Ruby (REXML): 2-clause BSD License (or Artistic License)
+- Nokogiri: MIT License
+- libxml-ruby: MIT License
+- Ox: 3-clause BSD License

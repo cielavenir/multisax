@@ -1,14 +1,23 @@
-#MultiSAX: Ruby Gem to handle multiple SAX libraries
-#Copyright (c) 2013, T. Yamada All rights reserved under 2-clause BSDL.
-#Check LICENSE terms.
-#Note: MIT License is also applicable if that compresses LICENSE file.
+# MultiSAX: Ruby Gem to handle multiple SAX libraries
+#
+# Copyright (c) 2013, T. Yamada All rights reserved under 2-clause BSDL.
+#
+# Check LICENSE terms.
+#
+# Note: MIT License is also applicable if that compresses LICENSE file.
 
 module MultiSAX
 	#VERSION=''
 
+	# The class to handle XML libraries.
 	class Sax
 		@@parser=nil
 		@@saxmodule=nil
+		# Library loader.
+		# Arguments are list (or Array) of libraries.
+		#  Currently the following are supported (order by speed):
+		#  :ox, :libxml, :nokogiri, :rexmlstream, :rexmlsax2
+		#  If multiple selected, MultiSAX will try the libraries one by one and use the first usable one.
 		def self.open(*list)
 			return @@parser if @@parser
 			list=[:ox,:libxml,:nokogiri,:rexmlstream,:rexmlsax2] if list.size==0
@@ -61,10 +70,19 @@ module MultiSAX
 			}
 			return @@parser
 		end
+		# Reset MultiSAX state so that you can re-open() another library.
 		def self.reset() @@parser=nil;@@saxmodule=nil end
+		# Returns which module is actually chosen.
 		def self.parser() @@parser end
 
+		#--
 		#def initialize(listener)
+		#++
+		# The main parsing method.
+		# Listener can be Class.new{include MultiSAX::Callbacks}.new. Returns the listener after SAX is applied.
+		# If you have not called open(), this will call it using default value (all libraries). 
+		#  SAX's listeners are usually modified destructively.
+		#  So instances shouldn't be provided.
 		def self.parse(body,listener)
 			#self.class.open if !@@parser
 			self.open if !@@parser
@@ -76,33 +94,40 @@ module MultiSAX
 				when :ox
 					@listener.instance_eval{
 						extend @@saxmodule
-						@saxwrapper_attr=[:xmldecl]
+						@saxwrapper_attr=[]
 						def start_element(tag)
+							# I hope provided Listener's sax_tag_start will NOT be used elsewhere.
+							alias :attrs_done :attrs_done_normal
 							@saxwrapper_tag=tag
 							@saxwrapper_attr=[]
 						end
+						# These "instance methods" are actually injected to listener class using instance_eval.
+						# i.e. not APIs. You cannot call these methods from outside.
 						def attr(name,str)
 							@saxwrapper_attr<<[name,str]
 						end
+						#--
 						#alias :attr_value :attr
-						def attrs_done
-							if @saxwrapper_attr.first==:xmldecl
-								@saxwrapper_attr.shift
-								version=@saxwrapper_attr.assoc(:version)
-								version&&=version[1]
-								encoding=@saxwrapper_attr.assoc(:encoding)
-								encoding&&=encoding[1]
-								standalone=@saxwrapper_attr.assoc(:standalone)
-								standalone&&=standalone[1]
-								sax_xmldecl(version,encoding,standalone)
-							else
-								sax_tag_start(@saxwrapper_tag.to_s,@saxwrapper_attr)
-							end
+						#++
+						def attrs_done_xmldecl
+							version=@saxwrapper_attr.assoc(:version)
+							version&&=version[1]
+							encoding=@saxwrapper_attr.assoc(:encoding)
+							encoding&&=encoding[1]
+							standalone=@saxwrapper_attr.assoc(:standalone)
+							standalone&&=standalone[1]
+							sax_xmldecl(version,encoding,standalone)
 						end
+						def attrs_done_normal
+							sax_tag_start(@saxwrapper_tag.to_s,@saxwrapper_attr)
+						end
+						alias :attrs_done :attrs_done_xmldecl
 						def end_element(tag) sax_tag_end(tag.to_s) end
 						alias :cdata :sax_cdata
 						alias :text :sax_text
+						#--
 						#alias :value :sax_text
+						#++
 						alias :comment :sax_comment
 					}
 				when :libxml
@@ -161,8 +186,13 @@ module MultiSAX
 			@listener
 		end
 	end
+
+	##
+	# MultiSAX callbacks.
+	# MultiSAX::Sax listener should include this module.
 	module Callbacks
-		# https://github.com/sparklemotion/nokogiri/blob/master/lib/nokogiri/xml/sax/document.rb
+		# Cited from Nokogiri to convert Nokogiri::XML::SAX::Document into module.
+		#  https://github.com/sparklemotion/nokogiri/blob/master/lib/nokogiri/xml/sax/document.rb
 		def sax_start_element_namespace name, attrs = [], prefix = nil, uri = nil, ns = []
 			# Deal with SAX v1 interface
 			name = [prefix, name].compact.join(':')

@@ -15,6 +15,8 @@ class MultiSAXTester
 		text.strip!
 		@result<<text if text.size>0
 	end
+	#def sax_xmldecl(version,encoding,standalone)
+	#end
 	attr_reader :result
 end
 input_xml=<<"EOM"
