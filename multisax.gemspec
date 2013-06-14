@@ -20,11 +20,13 @@ Gem::Specification.new do |s|
     ".document",
     ".rspec",
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE.txt",
     "README.rdoc",
     "Rakefile",
     "VERSION",
     "lib/multisax.rb",
+    "multisax.gemspec",
     "spec/multisax_spec.rb",
     "spec/spec_helper.rb"
   ]
