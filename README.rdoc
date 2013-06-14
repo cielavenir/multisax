@@ -1,6 +1,10 @@
 = multisax
 
-Please check spec/multisax.spec as an example.
+* Please check spec/multisax.spec as an example.
+* Optional XML libraries:
+* gem install ox
+* gem install libxml-ruby
+* gem install nokogiri
 
 == Contributing to multisax
  
