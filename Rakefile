@@ -14,13 +14,13 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "multisax"
-  gem.homepage = "http://github.com/cielavenir/multisax"
-  gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "cielartisan@gmail.com"
-  gem.authors = ["cielavenir"]
+  gem.name = 'multisax'
+  gem.homepage = 'http://github.com/cielavenir/multisax'
+  gem.license = '2-clause BSDL'
+  gem.summary = 'Ruby Gem to handle multiple SAX libraries'
+  gem.description = 'Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/rexml'
+  gem.email = 'cielartisan@gmail.com'
+  gem.authors = ['cielavenir']
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -39,8 +39,9 @@ end
 task :default => :spec
 
 require 'rdoc/task'
+require 'multisax'
 Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+  version = MultiSAX::VERSION
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "multisax #{version}"
