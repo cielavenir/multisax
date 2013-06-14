@@ -187,7 +187,6 @@ module MultiSAX
 		end
 	end
 
-	##
 	# MultiSAX callbacks.
 	# MultiSAX::Sax listener should include this module.
 	module Callbacks
