@@ -62,6 +62,7 @@ module MultiSAX
 			return @@parser
 		end
 		def self.reset() @@parser=nil;@@saxmodule=nil end
+		def self.parser() @@parser end
 
 		#def initialize(listener)
 		def self.parse(body,listener)
@@ -159,7 +160,6 @@ module MultiSAX
 			end
 			@listener
 		end
-		attr_reader :parser
 	end
 	module Callbacks
 		# https://github.com/sparklemotion/nokogiri/blob/master/lib/nokogiri/xml/sax/document.rb
