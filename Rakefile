@@ -39,9 +39,8 @@ end
 task :default => :spec
 
 require 'rdoc/task'
-require 'multisax'
 Rake::RDocTask.new do |rdoc|
-  version = MultiSAX::VERSION
+  version = File.read('VERSION').chomp
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "multisax #{version}"
