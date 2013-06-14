@@ -35,6 +35,5 @@ DEPENDENCIES
   libxml-ruby
   nokogiri
   ox
-  rake
   rdoc (>= 3.12)
   rspec (>= 2.8.0)

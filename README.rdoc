@@ -1,6 +1,6 @@
 = multisax
 
-Description goes here.
+Please check spec/multisax.spec as an example.
 
 == Contributing to multisax
  

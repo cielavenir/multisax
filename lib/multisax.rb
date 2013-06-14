@@ -4,7 +4,7 @@
 #Note: MIT License is also applicable if that compresses LICENSE file.
 
 module MultiSAX
-	VERSION='0.0.0.1'
+	#VERSION=''
 
 	class Sax
 		@@parser=nil
