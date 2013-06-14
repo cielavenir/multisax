@@ -1,6 +1,35 @@
 = multisax
 
 * Please check spec/multisax.spec as an example.
+* Complex usage:
+```ruby
+listener=MultiSAX::Sax.parse(xml,Class.new{
+	include MultiSAX::Callbacks
+	def initialize
+		@content=Hash.new{|h,k|h[k]=[]}
+		@current_tag=[]
+	end
+	attr_reader :content
+
+	def sax_tag_start(tag,attrs)
+		@current_tag.push(tag)
+	end
+	def sax_tag_end(tag)
+		if (t=@current_tag.pop)!=tag then raise "xml is malformed /#{t}" end
+	end
+	def sax_cdata(text)
+		@content[@current_tag.last] << text
+	end
+	def sax_text(text)
+		text.strip!
+		@content[@current_tag.last] << text if text.size>0
+	end
+	def sax_comment(text)
+	end
+}.new)
+listener.content.each{...}
+```
+
 * Optional XML libraries:
 * gem install ox
 * gem install libxml-ruby
@@ -20,4 +49,3 @@
 
 Copyright (c) 2013 cielavenir. See LICENSE.txt for
 further details.
-
