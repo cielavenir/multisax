@@ -46,5 +46,5 @@
 
 == Copyright
 
-Copyright (c) 2013 T. Yamada. See LICENSE.txt for
-further details.
+Copyright (c) 2013 T. Yamada under Ruby License (2-clause BSDL or Artistic).
+See LICENSE.txt for further details.

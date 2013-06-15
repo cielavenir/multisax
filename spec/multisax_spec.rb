@@ -26,6 +26,10 @@ EOM
 answer=['hello','sax','world','sax','hello']
 
 describe "Multisax" do
+	it "unknown" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:unknown).should be_false
+	end
 	it "rexmlstream" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlstream)

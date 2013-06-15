@@ -1,6 +1,6 @@
 # MultiSAX: Ruby Gem to handle multiple SAX libraries
 #
-# Copyright (c) 2013, T. Yamada All rights reserved under 2-clause BSDL.
+# Copyright (c) 2013, T. Yamada under Ruby License (2-clause BSDL or Artistic).
 #
 # Check LICENSE terms.
 #
@@ -27,7 +27,7 @@ module MultiSAX
 					when :ox
 						begin
 							require 'ox'
-							require 'stringio' #this should be official module.
+							require 'stringio' #this should be standard module.
 						rescue LoadError;next end
 						@@parser=e_module
 						methods=Ox::Sax.private_instance_methods(false)-Class.private_instance_methods(false)
@@ -78,15 +78,16 @@ module MultiSAX
 		#--
 		#def initialize(listener)
 		#++
+
 		# The main parsing method.
 		# Listener can be Class.new{include MultiSAX::Callbacks}.new. Returns the listener after SAX is applied.
-		# If you have not called open(), this will call it using default value (all libraries). 
+		# If you have not called open(), this will call it using default value (all libraries).
 		#  SAX's listeners are usually modified destructively.
 		#  So instances shouldn't be provided.
 		def self.parse(body,listener)
 			#self.class.open if !@@parser
 			self.open if !@@parser
-			raise "Failed to open SAX library. REXML, which is official Ruby module, might be also corrupted." if !@@parser
+			raise "Failed to open SAX library. REXML, which is a standard Ruby module, might be also corrupted." if !@@parser
 			@listener=listener
 
 			#Here comes method mapping.
