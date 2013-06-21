@@ -16,7 +16,7 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = 'multisax'
   gem.homepage = 'http://github.com/cielavenir/multisax'
-  gem.license = '2-clause BSDL'
+  gem.license = 'Ruby License (2-clause BSDL or Artistic)'
   gem.summary = 'Ruby Gem to handle multiple SAX libraries'
   gem.description = 'Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/rexml'
   gem.email = 'cielartisan@gmail.com'

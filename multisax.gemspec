@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "multisax"
-  s.version = "0.0.0.4"
+  s.version = "0.0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["cielavenir"]
-  s.date = "2013-06-14"
+  s.date = "2013-06-21"
   s.description = "Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/rexml"
   s.email = "cielartisan@gmail.com"
   s.extra_rdoc_files = [
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/cielavenir/multisax"
-  s.licenses = ["2-clause BSDL"]
+  s.licenses = ["Ruby License (2-clause BSDL or Artistic)"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.25"
   s.summary = "Ruby Gem to handle multiple SAX libraries"
