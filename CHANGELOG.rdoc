@@ -1,0 +1,27 @@
+= ChangeLog
+
+== 0.0.1 (2013 Jul 8)
+- Added ChangeLog.
+- Added Ruby 1.8.7 support.
+  - Might work on lower version, but not guaranteed.
+  - JRuby etc's supports depend on "require successfulness".
+  - Nokogiri is supported up to 1.5.x on Ruby 1.8.x.
+- MultiSAX::Sax.parse supports IO.
+  - rexmlsax2's stringio support is limited on Ruby 1.8.x. Be careful.
+  - Unless you directly specifies it, usually rexmlstream is selected.
+- Added MultiSAX::Sax.parsefile().
+
+== 0.0.0.5 (2013 Jun 21)
+- Added a test case.
+
+== 0.0.0.4 (2013 Jun 15)
+- Provided rdoc.
+
+== 0.0.0.3 (2013 Jun 14)
+- Fixed @@parser getter.
+
+== 0.0.0.2 (2013 Jun 14)
+- Fixed Rakefile.
+
+== 0.0.0.1 (2013 Jun 14)
+- First release.

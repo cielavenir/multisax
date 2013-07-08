@@ -1,5 +1,13 @@
 = multisax
 
+== Install
+* gem install multisax
+* Optional XML libraries:
+* gem install ox
+* gem install libxml-ruby
+* gem install nokogiri
+
+== Usage
 * Please check spec/multisax.spec as an example.
 * Complex usage:
     require 'multisax'
@@ -29,13 +37,7 @@
     }.new)
     listener.content.each{...}
 
-* Optional XML libraries:
-* gem install ox
-* gem install libxml-ruby
-* gem install nokogiri
-
 == Contributing to multisax
- 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
 * Fork the project.
@@ -45,6 +47,5 @@
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
 == Copyright
-
 Copyright (c) 2013 T. Yamada under Ruby License (2-clause BSDL or Artistic).
 See LICENSE.txt for further details.

@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "multisax"
-  s.version = "0.0.0.5"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["cielavenir"]
-  s.date = "2013-06-21"
+  s.date = "2013-07-08"
   s.description = "Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/rexml"
   s.email = "cielartisan@gmail.com"
   s.extra_rdoc_files = [
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     ".rspec",
+    "CHANGELOG.rdoc",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",

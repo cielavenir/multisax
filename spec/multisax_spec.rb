@@ -25,39 +25,72 @@ input_xml=<<"EOM"
 EOM
 answer=['hello','sax','world','sax','hello']
 
-describe "Multisax" do
-	it "unknown" do
+describe "MultiSAX::Sax.parse (String)" do
+	it "fails on :unknown" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:unknown).should be_false
 	end
-	it "rexmlstream" do
+	it ":rexmlstream" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlstream)
 		MultiSAX::Sax.parser.should eq :rexmlstream
 		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
 	end
-	it "rexmlsax2" do
+	it ":rexmlsax2" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlsax2)
 		MultiSAX::Sax.parser.should eq :rexmlsax2
 		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
 	end
-	it "ox" do
+	it ":ox" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ox)
 		MultiSAX::Sax.parser.should eq :ox
 		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
 	end
-	it "libxml" do
+	it ":libxml" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:libxml)
 		MultiSAX::Sax.parser.should eq :libxml
 		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
 	end
-	it "nokogiri" do
+	it ":nokogiri" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:nokogiri)
 		MultiSAX::Sax.parser.should eq :nokogiri
 		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
+	end
+end
+
+describe "MultiSAX::Sax.parse (IO)" do
+	it ":rexmlstream" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:rexmlstream)
+		MultiSAX::Sax.parser.should eq :rexmlstream
+		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+	end
+	it ":rexmlsax2" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:rexmlsax2)
+		MultiSAX::Sax.parser.should eq :rexmlsax2
+		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+	end
+	it ":ox" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:ox)
+		MultiSAX::Sax.parser.should eq :ox
+		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+	end
+	it ":libxml" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:libxml)
+		MultiSAX::Sax.parser.should eq :libxml
+		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+	end
+	it ":nokogiri" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:nokogiri)
+		MultiSAX::Sax.parser.should eq :nokogiri
+		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
 	end
 end

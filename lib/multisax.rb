@@ -25,13 +25,18 @@ module MultiSAX
 			list.each{|e_module|
 				case e_module
 					when :ox
+						#next if RUBY_VERSION<'1.9'
 						begin
 							require 'ox'
 							require 'stringio' #this should be standard module.
 						rescue LoadError;next end
 						@@parser=e_module
 						methods=Ox::Sax.private_instance_methods(false)-Class.private_instance_methods(false)
-						methods-=[:value,:attr_value]
+						if methods[0].is_a?(String) #Hack for 1.8.x
+							methods-=['value','attr_value']
+						else
+							methods-=[:value,:attr_value]
+						end
 						@@saxmodule=Module.new{
 							methods.each{|e|define_method(e){|*a|}}
 						}
@@ -42,12 +47,18 @@ module MultiSAX
 						rescue LoadError;next end
 						@@parser=e_module;break
 					when :nokogiri
+						#nokogiri 1.5.x are supported on Ruby 1.8.7.
+						#next if RUBY_VERSION<'1.9'
 						begin
 							require 'nokogiri'
 						rescue LoadError;next end
 						@@parser=e_module
 						methods=Nokogiri::XML::SAX::Document.instance_methods(false)-Class.instance_methods(false)
-						methods-=[:start_element_namespace,:end_element_namespace]
+						if methods[0].is_a?(String) #Hack for 1.8.x
+							methods-=['start_element_namespace','end_element_namespace']
+						else
+							methods-=[:start_element_namespace,:end_element_namespace]
+						end
 						@@saxmodule=Module.new{
 							methods.each{|e|define_method(e){|*a|}}
 						}
@@ -75,30 +86,19 @@ module MultiSAX
 		# Returns which module is actually chosen.
 		def self.parser() @@parser end
 
-		#--
-		#def initialize(listener)
-		#++
-
-		# The main parsing method.
-		# Listener can be Class.new{include MultiSAX::Callbacks}.new. Returns the listener after SAX is applied.
-		# If you have not called open(), this will call it using default value (all libraries).
-		#  SAX's listeners are usually modified destructively.
-		#  So instances shouldn't be provided.
-		def self.parse(body,listener)
-			#self.class.open if !@@parser
-			self.open if !@@parser
-			raise "Failed to open SAX library. REXML, which is a standard Ruby module, might be also corrupted." if !@@parser
-			@listener=listener
-
-			#Here comes method mapping.
+		private
+		#(private) Patches listener to accept library-specific APIs.
+		def self.method_mapping(listener)
+			#raise "MultiSAX::Sax open first" if !@@parser
 			case @@parser
 				when :ox
-					@listener.instance_eval{
+					listener.instance_eval{
 						extend @@saxmodule
+						@saxwrapper_tag=nil
 						@saxwrapper_attr=[]
 						def start_element(tag)
 							# I hope provided Listener's sax_tag_start will NOT be used elsewhere.
-							alias :attrs_done :attrs_done_normal
+							#alias :attrs_done :attrs_done_normal
 							@saxwrapper_tag=tag
 							@saxwrapper_attr=[]
 						end
@@ -122,7 +122,10 @@ module MultiSAX
 						def attrs_done_normal
 							sax_tag_start(@saxwrapper_tag.to_s,@saxwrapper_attr)
 						end
-						alias :attrs_done :attrs_done_xmldecl
+						#alias :attrs_done :attrs_done_xmldecl
+						def attrs_done
+							@saxwrapper_tag ? attrs_done_normal : attrs_done_xmldecl
+						end
 						def end_element(tag) sax_tag_end(tag.to_s) end
 						alias :cdata :sax_cdata
 						alias :text :sax_text
@@ -132,7 +135,7 @@ module MultiSAX
 						alias :comment :sax_comment
 					}
 				when :libxml
-					@listener.instance_eval{
+					listener.instance_eval{
 						extend LibXML::XML::SaxParser::Callbacks
 						alias :on_start_element :sax_tag_start
 						alias :on_end_element :sax_tag_end
@@ -142,7 +145,7 @@ module MultiSAX
 						#alias :xmldecl :sax_xmldecl
 					}
 				when :nokogiri
-					@listener.instance_eval{
+					listener.instance_eval{
 						extend @@saxmodule
 						alias :start_element_namespace :sax_start_element_namespace
 						alias :start_element :sax_tag_start
@@ -154,7 +157,7 @@ module MultiSAX
 						alias :xmldecl :sax_xmldecl
 					}
 				when :rexmlstream
-					@listener.instance_eval{
+					listener.instance_eval{
 						extend REXML::StreamListener
 						alias :tag_start :sax_tag_start
 						alias :tag_end :sax_tag_end
@@ -164,7 +167,7 @@ module MultiSAX
 						alias :xmldecl :sax_xmldecl
 					}
 				when :rexmlsax2
-					@listener.instance_eval{
+					listener.instance_eval{
 						extend REXML::SAX2Listener
 						def start_element(uri,tag,qname,attrs) sax_tag_start(tag,attrs) end
 						def end_element(uri,tag,qname) sax_tag_end(tag) end
@@ -174,16 +177,51 @@ module MultiSAX
 						alias :xmldecl :sax_xmldecl
 					}
 			end
-		#end
-		#def parse(body)
-			#Here comes parsing mapping.
-			case @@parser
-				when :ox          then Ox.sax_parse(@listener,StringIO.new(body),:convert_special=>true)
-				when :libxml      then parser=LibXML::XML::SaxParser.string(body);parser.callbacks=@listener;parser.parse
-				when :nokogiri    then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(body)
-				when :rexmlstream then REXML::Parsers::StreamParser.new(body,@listener).parse
-				when :rexmlsax2   then parser=REXML::Parsers::SAX2Parser.new(body);parser.listen(@listener);parser.parse
+			listener
+		end
+
+		public
+		# The main parsing method.
+		# Listener can be Class.new{include MultiSAX::Callbacks}.new. Returns the listener after SAX is applied.
+		# If you have not called open(), this will call it using default value (all libraries).
+		#  From 0.0.1, source can be IO as well as String.
+		#  SAX's listeners are usually modified destructively.
+		#  So instances shouldn't be provided.
+		def self.parse(source,listener)
+			self.open if !@@parser
+			raise "Failed to open SAX library. REXML, which is a standard Ruby module, might be also corrupted." if !@@parser
+			@listener=listener
+			self.method_mapping(@listener)
+			if source.is_a?(String)
+				case @@parser
+					when :ox          then Ox.sax_parse(@listener,StringIO.new(source),:convert_special=>true)
+					when :libxml      then parser=LibXML::XML::SaxParser.string(source);parser.callbacks=@listener;parser.parse
+					when :nokogiri    then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(source)
+					when :rexmlstream then REXML::Parsers::StreamParser.new(source,@listener).parse
+					when :rexmlsax2   then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
+				end
+			else
+				case @@parser
+					when :ox          then Ox.sax_parse(@listener,source,:convert_special=>true)
+					when :libxml      then parser=LibXML::XML::SaxParser.io(source);parser.callbacks=@listener;parser.parse
+					when :nokogiri    then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(source)
+					when :rexmlstream then REXML::Parsers::StreamParser.new(source,@listener).parse
+					when :rexmlsax2   then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
+				end
 			end
+			@listener
+		end
+
+		# Parses file as XML. Error handling might be changed in the future.
+		def self.parsefile(filename,listener)
+			#begin
+				return nil unless FileTest::readable?(filename)
+				File.open(filename,'rb'){|f|
+					self.parse(f,listener)
+				}
+			#rescue
+			#	return nil
+			#end
 			@listener
 		end
 	end
