@@ -1,31 +1,12 @@
-# encoding: utf-8
-
-require 'rubygems'
-require 'bundler'
+require 'bundler/gem_tasks'
 require './lib/multisax'
-begin
-  Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
-end
-require 'rake'
 
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = 'multisax'
-  gem.homepage = 'http://github.com/cielavenir/multisax'
-  gem.license = 'Ruby License (2-clause BSDL or Artistic)'
-  gem.summary = 'Ruby Gem to handle multiple SAX libraries'
-  gem.description = 'Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/rexml'
-  gem.email = 'cielartisan@gmail.com'
-  gem.authors = ['cielavenir']
-  gem.version = MultiSAX::VERSION
-  # dependencies defined in Gemfile
-end
-Jeweler::RubygemsDotOrgTasks.new
+### below are copied from jeweler ###
+
+require 'rake'
+# Clean up after gem building
+require 'rake/clean'
+CLEAN.include('pkg/*.gem')
 
 require 'rspec/core'
 require 'rspec/core/rake_task'

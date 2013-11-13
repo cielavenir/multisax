@@ -2,10 +2,11 @@
 
 == 0.0.2 (2013 Nov 13)
 - Now you can create an instance of MultiSAX::SAX.
-  - Please note that passed class to MultiSAX is modified directly.
+  - Please note that passed class to MultiSAX is still modified directly.
   - So only MultiSAX::SAX instances are thread-safe.
-  - MultiSAX::Sax is now an inatance of MultiSAX::SAX (this is backward-compatible).
+  - MultiSAX::Sax is now an instance of MultiSAX::SAX (this is backward-compatible).
 - You can specify :nokogirihtml explicitly to parse HTML.
+- Fixed attrs with Ox (now String is passed, not Symbol)
 
 == 0.0.1 (2013 Jul 8)
 - Added ChangeLog.

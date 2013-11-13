@@ -7,6 +7,7 @@
 # Note: MIT License is also applicable if that compresses LICENSE file.
 
 module MultiSAX
+	# VERSION string
 	VERSION='0.0.2'
 
 	# The class to handle XML libraries.
@@ -22,7 +23,6 @@ module MultiSAX
 		def open(*list)
 			return @parser if @parser
 			list=[:ox,:libxml,:nokogiri,:rexmlstream,:rexmlsax2] if list.size==0
-			list=list.first if list.first.is_a?(Array)
 			list.each{|e_module|
 				case e_module
 					when :ox
@@ -97,29 +97,23 @@ module MultiSAX
 					listener.instance_eval{
 						extend saxmodule
 						@saxwrapper_tag=nil
-						@saxwrapper_attr=[]
+						@saxwrapper_attr={}
 						def start_element(tag)
 							# I hope provided Listener's sax_tag_start will NOT be used elsewhere.
 							#alias :attrs_done :attrs_done_normal
 							@saxwrapper_tag=tag
-							@saxwrapper_attr=[]
+							@saxwrapper_attr={}
 						end
 						# These "instance methods" are actually injected to listener class using instance_eval.
 						# i.e. not APIs. You cannot call these methods from outside.
 						def attr(name,str)
-							@saxwrapper_attr<<[name,str]
+							@saxwrapper_attr[name.to_s]=str
 						end
 						#--
 						#alias :attr_value :attr
 						#++
 						def attrs_done_xmldecl
-							version=@saxwrapper_attr.assoc(:version)
-							version&&=version[1]
-							encoding=@saxwrapper_attr.assoc(:encoding)
-							encoding&&=encoding[1]
-							standalone=@saxwrapper_attr.assoc(:standalone)
-							standalone&&=standalone[1]
-							sax_xmldecl(version,encoding,standalone)
+							sax_xmldecl(@saxwrapper_attr['version'],@saxwrapper_attr['encoding'],@saxwrapper_attr['standalone'])
 						end
 						def attrs_done_normal
 							sax_tag_start(@saxwrapper_tag.to_s,@saxwrapper_attr)
@@ -231,32 +225,55 @@ module MultiSAX
 		end
 	end
 
-	Sax=SAX.new #fixme...
+	# This class provides singleton interface to MultiSAX::SAX.
+	class Sax
+		@@multisax_singleton=SAX.new
+		# MultiSAX::SAX#open
+		def self.open(*list) @@multisax_singleton.open(*list) end
+		# MultiSAX::SAX#reset
+		def self.reset() @@multisax_singleton.reset() end
+		# MultiSAX::SAX#parser
+		def self.parser() @@multisax_singleton.parser() end
+		# MultiSAX::SAX#parse
+		def self.parse(source,listener) @@multisax_singleton.parse(source,listener) end
+		# MultiSAX::SAX#parsefile
+		def self.parsefile(filename,listener) @@multisax_singleton.parsefile(filename,listener) end
+	end
 
 	# MultiSAX callbacks.
-	# MultiSAX::Sax listener should include this module.
+	# MultiSAX::SAX listener should include this module.
 	module Callbacks
 		# Cited from Nokogiri to convert Nokogiri::XML::SAX::Document into module.
 		#  https://github.com/sparklemotion/nokogiri/blob/master/lib/nokogiri/xml/sax/document.rb
 		def sax_start_element_namespace name, attrs = [], prefix = nil, uri = nil, ns = []
 			# Deal with SAX v1 interface
 			name = [prefix, name].compact.join(':')
-			attributes = ns.map { |ns_prefix,ns_uri|
-				[['xmlns', ns_prefix].compact.join(':'), ns_uri]
-			} + attrs.map { |attr|
-				[[attr.prefix, attr.localname].compact.join(':'), attr.value]
+			# modified in 0.0.2
+			attributes = {}
+			ns.each{|ns_prefix,ns_uri|
+				attributes[['xmlns', ns_prefix].compact.join(':')]=ns_uri
+			}
+			attrs.each{|attr|
+				attributes[[attr.prefix, attr.localname].compact.join(':')]=attr.value
 			}
 			sax_tag_start name, attributes
         end
+		# Cited from Nokogiri
 		def sax_end_element_namespace name, prefix = nil, uri = nil
 			# Deal with SAX v1 interface
 			sax_tag_end [prefix, name].compact.join(':')
 		end
-		def sax_tag_start(tag,attr) end
+		# Start of tag
+		def sax_tag_start(tag,attrs) end
+		# End of tag
 		def sax_tag_end(tag) end
+		# Comment
 		def sax_comment(text) end
+		# CDATA
 		def sax_cdata(text) end
+		# Text
 		def sax_text(text) end
+		# XML declaration (not available if parser is :libxml)
 		def sax_xmldecl(version,encoding,standalone) end
 	end
 end

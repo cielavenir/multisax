@@ -4,9 +4,11 @@ class MultiSAXTester
 	include MultiSAX::Callbacks
 	def initialize
 		@result=[]
+		@attrib=nil
 	end
 	def sax_tag_start(tag,attrs)
 		@result<<tag
+		@attrib=attrs['foo'] if tag=='sax'
 	end
 	def sax_tag_end(tag)
 		@result<<tag
@@ -15,13 +17,14 @@ class MultiSAXTester
 		text.strip!
 		@result<<text if text.size>0
 	end
-	#def sax_xmldecl(version,encoding,standalone)
-	#end
-	attr_reader :result
+	def sax_xmldecl(version,encoding,standalone)
+		@xmlencoding=encoding
+	end
+	attr_reader :result,:attrib,:xmlencoding
 end
 input_xml=<<"EOM"
-<?xml version="1.0" encoding="utf-8"?>
-<hello><sax>world</sax></hello>
+<?xml version="1.0" encoding="UTF-8"?>
+<hello><sax foo="bar">world</sax></hello>
 EOM
 answer=['hello','sax','world','sax','hello']
 
@@ -30,67 +33,97 @@ describe "MultiSAX::Sax.parse (String)" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:unknown).should be_false
 	end
-	it ":rexmlstream" do
+	it "uses :rexmlstream" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlstream)
 		MultiSAX::Sax.parser.should eq :rexmlstream
-		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":rexmlsax2" do
+	it "uses :rexmlsax2" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlsax2)
 		MultiSAX::Sax.parser.should eq :rexmlsax2
-		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":ox" do
+	it "uses :ox" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ox)
 		MultiSAX::Sax.parser.should eq :ox
-		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":libxml" do
+	it "uses :libxml" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:libxml)
 		MultiSAX::Sax.parser.should eq :libxml
-		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		#listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":nokogiri" do
+	it "uses :nokogiri" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:nokogiri)
 		MultiSAX::Sax.parser.should eq :nokogiri
-		MultiSAX::Sax.parse(input_xml,MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
 end
 
 describe "MultiSAX::Sax.parse (IO)" do
-	it ":rexmlstream" do
+	it "uses :rexmlstream" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlstream)
 		MultiSAX::Sax.parser.should eq :rexmlstream
-		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":rexmlsax2" do
+	it "uses :rexmlsax2" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:rexmlsax2)
 		MultiSAX::Sax.parser.should eq :rexmlsax2
-		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":ox" do
+	it "uses :ox" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ox)
 		MultiSAX::Sax.parser.should eq :ox
-		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":libxml" do
+	it "uses :libxml" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:libxml)
 		MultiSAX::Sax.parser.should eq :libxml
-		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		#listener.xmlencoding.should eq 'UTF-8'
 	end
-	it ":nokogiri" do
+	it "uses :nokogiri" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:nokogiri)
 		MultiSAX::Sax.parser.should eq :nokogiri
-		MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new).result.should eq answer
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq answer
+		listener.attrib.should eq 'bar'
+		listener.xmlencoding.should eq 'UTF-8'
 	end
 end
