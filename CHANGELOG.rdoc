@@ -1,5 +1,12 @@
 = ChangeLog
 
+== 0.0.3 (2013 Nov 14)
+- Fixed namespace handling.
+- Now you can also select :oxhtml to parse HTML.
+- Added shortcut :XML and :HTML.
+- sax_tag_start()'s attrs is assured to be a Hash.
+- Refined spec.
+
 == 0.0.2 (2013 Nov 13)
 - Now you can create an instance of MultiSAX::SAX.
   - Please note that passed class to MultiSAX is still modified directly.
