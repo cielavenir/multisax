@@ -1,5 +1,12 @@
 = ChangeLog
 
+== 0.0.2 (2013 Nov 13)
+- Now you can create an instance of MultiSAX::SAX.
+  - Please note that passed class to MultiSAX is modified directly.
+  - So only MultiSAX::SAX instances are thread-safe.
+  - MultiSAX::Sax is now an inatance of MultiSAX::SAX (this is backward-compatible).
+- You can specify :nokogirihtml explicitly to parse HTML.
+
 == 0.0.1 (2013 Jul 8)
 - Added ChangeLog.
 - Added Ruby 1.8.7 support.

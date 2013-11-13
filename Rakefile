@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'bundler'
+require './lib/multisax'
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e
@@ -21,6 +22,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = 'Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/rexml'
   gem.email = 'cielartisan@gmail.com'
   gem.authors = ['cielavenir']
+  gem.version = MultiSAX::VERSION
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -40,10 +42,8 @@ task :default => :spec
 
 require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
-  version = File.read('VERSION').chomp
-
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "multisax #{version}"
+  rdoc.title = 'multisax '+MultiSAX::VERSION
   rdoc.main = 'README.rdoc'
   rdoc.rdoc_files.include('README.*')
   rdoc.rdoc_files.include('LICENSE.*')
