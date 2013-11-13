@@ -7,6 +7,7 @@
   - MultiSAX::Sax is now an instance of MultiSAX::SAX (this is backward-compatible).
 - You can specify :nokogirihtml explicitly to parse HTML.
 - Fixed attrs with Ox (now String is passed, not Symbol)
+- Moved to Bundler rather than Jeweler.
 
 == 0.0.1 (2013 Jul 8)
 - Added ChangeLog.
