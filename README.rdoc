@@ -3,7 +3,7 @@
 == Binary distribution
 * https://rubygems.org/gems/multisax
 
-== Minimalistic Edition
+== (Embeddable) Minimalistic Edition
 * https://gist.github.com/cielavenir/7691221
   * multisax_mini.rb:  :libxml/:rexmlstream/:rexmlsax2
   * multisax_mini2.rb: :libxml/:rexmlstream
