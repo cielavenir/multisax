@@ -21,7 +21,9 @@ end
 
 task :default => :spec
 
+begin
 require 'rdoc/task'
+rescue LoadError # Thus rdoc generation is limited to Ruby 1.9.3+...
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = 'multisax '+MultiSAX::VERSION
@@ -30,4 +32,5 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('LICENSE.*')
   rdoc.rdoc_files.include('CHANGELOG.*')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
 end
