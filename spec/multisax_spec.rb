@@ -132,14 +132,16 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 end
 
 # broken intentionally
+# nokogiri-java wants head tag...
 input_html=<<"EOM"
 <html>
+<head></head>
 <body>
 <span class="foo">hello
 </body>
 </html>
 EOM
-html_answer=['html','body','span','hello','span','body','html']
+html_answer=['html','head','head','body','span','hello','span','body','html']
 
 describe "[HTML] MultiSAX::Sax.parse(String)" do
 	it "uses :oxhtml" do
