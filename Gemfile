@@ -2,16 +2,17 @@ source "http://rubygems.org"
 
 platforms :rbx do
 	gem 'rubysl'
+	gem 'racc' # nokogiri
 end
 
+#This clause is broken. So, please do not use bundle install if you are not developing multisax.
 group :test do
 	#if RUBY_VERSION>='1.9'
 	#	gem 'nokogiri'
 	#else
-		#bah. So, please do not use bundle install if you are not developing multisax.
 		gem 'nokogiri', '~> 1.5.0'
 	#end
-	if !defined?(RUBY_ENGINE)||RUBY_ENGINE!='jruby'
+	platforms :ruby do
 		gem 'libxml-ruby'
 		gem 'ox'
 	end

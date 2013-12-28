@@ -6,6 +6,7 @@ GEM
     libxml-ruby (2.7.0)
     nokogiri (1.5.11)
     ox (2.0.12)
+    racc (1.4.10)
     rake (10.1.1)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
@@ -226,6 +227,7 @@ DEPENDENCIES
   libxml-ruby
   nokogiri (~> 1.5.0)
   ox
+  racc
   rake
   rspec
   rubysl
