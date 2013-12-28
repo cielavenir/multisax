@@ -8,7 +8,8 @@ group :test do
 	#if RUBY_VERSION>='1.9'
 	#	gem 'nokogiri'
 	#else
-		gem 'nokogiri', '~> 1.5.0' #bah. So, please do not use bundle install if you are not developing multisax.
+		#bah. So, please do not use bundle install if you are not developing multisax.
+		gem 'nokogiri', '~> 1.5.0'
 	#end
 	if !defined?(RUBY_ENGINE)||RUBY_ENGINE!='jruby'
 		gem 'libxml-ruby'
