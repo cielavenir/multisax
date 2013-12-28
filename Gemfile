@@ -5,13 +5,15 @@ platforms :rbx do
 end
 
 group :test do
-	gem 'libxml-ruby'
 	#if RUBY_VERSION>='1.9'
 	#	gem 'nokogiri'
 	#else
 		gem 'nokogiri', '~> 1.5.0' #bah. So, please do not use bundle install if you are not developing multisax.
 	#end
-	gem 'ox'
+	if !defined?(RUBY_ENGINE)||RUBY_ENGINE!='jruby'
+		gem 'libxml-ruby'
+		gem 'ox'
+	end
 end
 
 group :development, :test do

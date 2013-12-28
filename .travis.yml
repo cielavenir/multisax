@@ -9,4 +9,10 @@ rvm:
   - jruby-18mode
   - jruby-19mode
   - jruby-20mode
-  - rbx
+  - rbx-2.0.0
+  - rbx-2.1.1
+  - macruby
+allow_failures:
+  - rvm: jruby-18mode
+  - rvm: jruby-19mode
+  - rvm: jruby-20mode
