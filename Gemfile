@@ -1,16 +1,17 @@
 source "http://rubygems.org"
 
-group :optional do
-	gem 'libxml-ruby', :require=>nil
-	if RUBY_VERSION<'1.9'
-		gem 'nokogiri', '~> 1.5.0', :require=>nil
+group :test do
+	gem 'libxml-ruby'
+	if RUBY_VERSION>='1.9'
+		gem 'nokogiri'
 	else
-		gem 'nokogiri', :require=>nil
+		gem 'nokogiri', '~> 1.5.0'
 	end
-	gem 'ox', :require=>nil
+	gem 'ox'
 end
 
-group :development do
-  gem 'rspec'
-  gem 'bundler', '>= 1.0'
+group :development, :test do
+	gem 'bundler', '>= 1.0'
+	gem 'rake'
+	gem 'rspec'
 end

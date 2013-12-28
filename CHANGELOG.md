@@ -1,13 +1,13 @@
-= ChangeLog
+# ChangeLog
 
-== 0.0.3 (2013 Nov 14)
+## 0.0.3 (2013 Nov 14)
 - Fixed namespace handling.
 - Now you can also select :oxhtml to parse HTML.
 - Added shortcut :XML and :HTML.
 - sax_tag_start()'s attrs is assured to be a Hash.
 - Refined spec.
 
-== 0.0.2 (2013 Nov 13)
+## 0.0.2 (2013 Nov 13)
 - Now you can create an instance of MultiSAX::SAX.
   - Please note that passed class to MultiSAX is still modified directly.
   - So only MultiSAX::SAX instances are thread-safe.
@@ -16,7 +16,7 @@
 - Fixed attrs with Ox (now String is passed, not Symbol)
 - Moved to Bundler rather than Jeweler.
 
-== 0.0.1 (2013 Jul 8)
+## 0.0.1 (2013 Jul 8)
 - Added ChangeLog.
 - Added Ruby 1.8.7 support.
   - Might work on lower version, but not guaranteed.
@@ -27,17 +27,17 @@
   - Unless you directly specifies it, usually rexmlstream is selected.
 - Added MultiSAX::Sax.parsefile().
 
-== 0.0.0.5 (2013 Jun 21)
+## 0.0.0.5 (2013 Jun 21)
 - Added a test case.
 
-== 0.0.0.4 (2013 Jun 15)
+## 0.0.0.4 (2013 Jun 15)
 - Provided rdoc.
 
-== 0.0.0.3 (2013 Jun 14)
+## 0.0.0.3 (2013 Jun 14)
 - Fixed @@parser getter.
 
-== 0.0.0.2 (2013 Jun 14)
+## 0.0.0.2 (2013 Jun 14)
 - Fixed Rakefile.
 
-== 0.0.0.1 (2013 Jun 14)
+## 0.0.0.1 (2013 Jun 14)
 - First release.
