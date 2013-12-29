@@ -202,25 +202,25 @@ module MultiSAX
 			@listener=listener
 			method_mapping(@listener)
 			if source.is_a?(String)
-				case @parser
-					when :ox           then Ox.sax_parse(@listener,StringIO.new(source),:convert_special=>true)
-					when :oxhtml       then Ox.sax_parse(@listener,StringIO.new(source),:convert_special=>true,:smart=>true)
-					when :libxml       then parser=LibXML::XML::SaxParser.string(source);parser.callbacks=@listener;parser.parse
-					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(source)
-					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@listener);parser.parse(source)
-					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,@listener).parse
-					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
-				end
+				{
+					:ox           => lambda{|listener| Ox.sax_parse(listener,StringIO.new(source),:convert_special=>true) },
+					:oxhtml       => lambda{|listener| Ox.sax_parse(listener,StringIO.new(source),:convert_special=>true,:smart=>true) },
+					:libxml       => lambda{|listener| parser=LibXML::XML::SaxParser.string(source);parser.callbacks=listener;parser.parse },
+					:nokogiri     => lambda{|listener| parser=Nokogiri::XML::SAX::Parser.new(listener);parser.parse(source) },
+					:nokogirihtml => lambda{|listener| parser=Nokogiri::HTML::SAX::Parser.new(listener);parser.parse(source) },
+					:rexmlstream  => lambda{|listener| REXML::Parsers::StreamParser.new(source,listener).parse },
+					:rexmlsax2    => lambda{|listener| parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(listener);parser.parse },
+				}[@parser][@listener]
 			else
-				case @parser
-					when :ox           then Ox.sax_parse(@listener,source,:convert_special=>true)
-					when :oxhtml       then Ox.sax_parse(@listener,source,:convert_special=>true,:smart=>true)
-					when :libxml       then parser=LibXML::XML::SaxParser.io(source);parser.callbacks=@listener;parser.parse
-					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(source)
-					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@listener);parser.parse(source.read) # fixme
-					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,@listener).parse
-					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
-				end
+				{
+					:ox           => lambda{|listener| Ox.sax_parse(listener,source,:convert_special=>true) },
+					:oxhtml       => lambda{|listener| Ox.sax_parse(listener,source,:convert_special=>true,:smart=>true) },
+					:libxml       => lambda{|listener| parser=LibXML::XML::SaxParser.io(source);parser.callbacks=listener;parser.parse },
+					:nokogiri     => lambda{|listener| parser=Nokogiri::XML::SAX::Parser.new(listener);parser.parse(source) },
+					:nokogirihtml => lambda{|listener| parser=Nokogiri::HTML::SAX::Parser.new(listener);parser.parse(source.read) }, # fixme
+					:rexmlstream  => lambda{|listener| REXML::Parsers::StreamParser.new(source,listener).parse },
+					:rexmlsax2    => lambda{|listener| parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(listener);parser.parse },
+				}[@parser][@listener]
 			end
 			@listener
 		end
