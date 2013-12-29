@@ -36,8 +36,11 @@ module MultiSAX
 						rescue LoadError;next end
 						@parser=e_module
 						methods=Ox::Sax.private_instance_methods(false)-Class.private_instance_methods(false)
-						#Hack for 1.8.x
-						methods-=[:value,:attr_value].map{|e|methods[0].is_a?(String) ? e.to_s : e}
+						if methods[0].is_a?(String) #Hack for 1.8.x
+							methods-=['value','attr_value']
+						else
+							methods-=[:value,:attr_value]
+						end
 						@saxmodule=Module.new{
 							methods.each{|e|define_method(e){|*args|}}
 						}
@@ -55,8 +58,11 @@ module MultiSAX
 						rescue LoadError;next end
 						@parser=e_module
 						methods=Nokogiri::XML::SAX::Document.instance_methods(false)-Class.instance_methods(false)
-						#Hack for 1.8.x
-						methods-=[:start_element_namespace,:end_element_namespace].map{|e|methods[0].is_a?(String) ? e.to_s : e}
+						if methods[0].is_a?(String) #Hack for 1.8.x
+							methods-=['start_element_namespace','end_element_namespace']
+						else
+							methods-=[:start_element_namespace,:end_element_namespace]
+						end
 						@saxmodule=Module.new{
 							methods.each{|e|define_method(e){|*args|}}
 						}
