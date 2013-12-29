@@ -7,6 +7,7 @@ require 'rake'
 # Clean up after gem building
 require 'rake/clean'
 CLEAN.include('pkg/*.gem')
+CLOBBER.include('coverage')
 
 require 'rspec/core'
 require 'rspec/core/rake_task'

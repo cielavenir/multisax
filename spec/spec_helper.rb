@@ -1,9 +1,9 @@
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rspec'
-require 'stringio'
-require 'multisax'
+RSpec.configure{|config|
+	config.color=true
+}
 
+require 'stringio'
 if RUBY_VERSION<'1.9' #gee, StringIO needs to be hacked.
 	class StringIO
 		def stat
@@ -14,10 +14,9 @@ if RUBY_VERSION<'1.9' #gee, StringIO needs to be hacked.
 	end
 end
 
-# Requires supporting files with custom matchers and macros, etc,
-# in ./support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
+require 'simplecov'
+SimpleCov.start do
+  add_filter 'spec'
+end
 
-RSpec.configure{|config|
-	config.color=true
-}
+require File.expand_path('../../lib/multisax',__FILE__)

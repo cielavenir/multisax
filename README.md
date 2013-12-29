@@ -1,7 +1,7 @@
 # multisax
 A module which allows multiple SAX library transparently.
 
-[![Build Status](https://travis-ci.org/cielavenir/multisax.png)](https://travis-ci.org/cielavenir/multisax)
+[![Build Status](https://travis-ci.org/cielavenir/multisax.png)](https://travis-ci.org/cielavenir/multisax) [![Code Climate](https://codeclimate.com/github/cielavenir/multisax.png)](https://codeclimate.com/github/cielavenir/multisax)
 
 ## Binary distribution
 * https://rubygems.org/gems/multisax

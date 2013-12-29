@@ -22,4 +22,5 @@ group :development, :test do
 	gem 'bundler', '>= 1.0'
 	gem 'rake'
 	gem 'rspec'
+	gem 'simplecov'
 end

@@ -36,13 +36,10 @@ module MultiSAX
 						rescue LoadError;next end
 						@parser=e_module
 						methods=Ox::Sax.private_instance_methods(false)-Class.private_instance_methods(false)
-						if methods[0].is_a?(String) #Hack for 1.8.x
-							methods-=['value','attr_value']
-						else
-							methods-=[:value,:attr_value]
-						end
+						#Hack for 1.8.x
+						methods-=[:value,:attr_value].map{|e|methods[0].is_a?(String) ? e.to_s : e}
 						@saxmodule=Module.new{
-							methods.each{|e|define_method(e){|*a|}}
+							methods.each{|e|define_method(e){|*args|}}
 						}
 						break
 					when :libxml
@@ -58,13 +55,10 @@ module MultiSAX
 						rescue LoadError;next end
 						@parser=e_module
 						methods=Nokogiri::XML::SAX::Document.instance_methods(false)-Class.instance_methods(false)
-						if methods[0].is_a?(String) #Hack for 1.8.x
-							methods-=['start_element_namespace','end_element_namespace']
-						else
-							methods-=[:start_element_namespace,:end_element_namespace]
-						end
+						#Hack for 1.8.x
+						methods-=[:start_element_namespace,:end_element_namespace].map{|e|methods[0].is_a?(String) ? e.to_s : e}
 						@saxmodule=Module.new{
-							methods.each{|e|define_method(e){|*a|}}
+							methods.each{|e|define_method(e){|*args|}}
 						}
 						break
 					when :rexmlstream
@@ -196,8 +190,9 @@ module MultiSAX
 		#  SAX's listeners are usually modified destructively.
 		#  So instances shouldn't be provided.
 		def parse(source,listener)
-			open if !@parser
-			raise "Failed to open SAX library. REXML, which is a standard Ruby module, might be also corrupted." if !@parser
+			if !@parser && !open
+				raise "Failed to open SAX library. REXML, which is a standard Ruby module, might be also corrupted."
+			end
 			@listener=listener
 			method_mapping(@listener)
 			if source.is_a?(String)
