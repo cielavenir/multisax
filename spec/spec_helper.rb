@@ -14,12 +14,11 @@ if RUBY_VERSION<'1.9' #gee, StringIO needs to be hacked.
 	end
 end
 
-begin
+if !defined?(RUBY_ENGINE)||RUBY_ENGINE=='ruby'
 	require 'simplecov'
 	SimpleCov.start do
 		add_filter 'spec'
 	end
-rescue LoadError # kill simplecov feature on rbx...
 end
 
-require File.expand_path('../../lib/multisax',__FILE__)
+require File.expand_path(File.dirname(__FILE__)+'/../lib/multisax')
