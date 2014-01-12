@@ -8,41 +8,70 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.3'
+	VERSION='0.0.5'
 
 	# The class to handle XML libraries.
 	class SAX
-		@parser=nil
-		@saxmodule=nil
+		# constructor
+		def initialize
+			@parser=nil
+		end
 		# Library loader.
 		# Arguments are list (or Array) of libraries.
 		#  if list is empty or :XML, the following are searched (order by speed):
-		#  :ox, :libxml, :nokogiri, :rexmlstream, :rexmlsax2
+		#  :ox, :libxml, :nokogiri, :xmlparser, :rexmlstream, :rexmlsax2
 		#  if list is :HTML, the following are searched (order by speed):
 		#  :oxhtml, :nokogirihtml
 		#  You can also specify libraries individually.
 		#  If multiple selected, MultiSAX will try the libraries one by one and use the first usable one.
 		def open(*list)
 			return @parser if @parser
-			list=[:ox,:libxml,:nokogiri,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
+			list=[:ox,:libxml,:nokogiri,:xmlparser,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
 			list=[:oxhtml,:nokogirihtml] if list==[:HTML]
 			list.each{|e_module|
 				case e_module
 					when :ox,:oxhtml
-						#next if RUBY_VERSION<'1.9'
 						begin
 							require 'ox'
 							require 'stringio' #this should be standard module.
 						rescue LoadError;next end
 						@parser=e_module
-						methods=Ox::Sax.private_instance_methods(false)-Class.private_instance_methods(false)
-						if methods[0].is_a?(String) #Hack for 1.8.x
-							methods-=['value','attr_value']
-						else
-							methods-=[:value,:attr_value]
-						end
-						@saxmodule=Module.new{
-							methods.each{|e|define_method(e){|*args|}}
+						@saxhelper=Class.new(Ox::Sax){
+							def __init__(obj)
+								@obj=obj
+								@saxwrapper_tag=nil
+								@saxwrapper_attr={}
+								self
+							end
+							def end_element(tag) @obj.sax_tag_end(tag.to_s) end
+							def cdata(txt) @obj.sax_cdata(txt) end
+							def text(txt) @obj.sax_text(txt) end
+							def comment(txt) @obj.sax_comment(txt) end
+
+							def start_element(tag)
+								if @after_error
+									@obj.sax_tag_start(tag.to_s,{})
+									@after_error=false
+								else
+									# I hope provided Listener's sax_tag_start will NOT be used elsewhere.
+									#alias :attrs_done :attrs_done_normal
+									@saxwrapper_tag=tag
+									@saxwrapper_attr={}
+								end
+							end
+							def attr(name,str)
+								@saxwrapper_attr[name.to_s]=str
+							end
+							def attrs_done_xmldecl
+								@obj.sax_xmldecl(@saxwrapper_attr['version'],@saxwrapper_attr['encoding'],@saxwrapper_attr['standalone'])
+							end
+							def attrs_done_normal
+								@obj.sax_tag_start(@saxwrapper_tag.to_s,@saxwrapper_attr)
+							end
+							def attrs_done
+								@saxwrapper_tag ? attrs_done_normal : attrs_done_xmldecl
+							end
+							def error(s,i,j) @after_error=true if s.end_with?('closed but not opened') end
 						}
 						break
 					when :libxml
@@ -57,14 +86,47 @@ module MultiSAX
 							require 'nokogiri'
 						rescue LoadError;next end
 						@parser=e_module
-						methods=Nokogiri::XML::SAX::Document.instance_methods(false)-Class.instance_methods(false)
-						if methods[0].is_a?(String) #Hack for 1.8.x
-							methods-=['start_element_namespace','end_element_namespace']
-						else
-							methods-=[:start_element_namespace,:end_element_namespace]
-						end
-						@saxmodule=Module.new{
-							methods.each{|e|define_method(e){|*args|}}
+						@saxhelper=Class.new(Nokogiri::XML::SAX::Document){
+							def __init__(obj)
+								@obj=obj
+								self
+							end
+							def start_element(tag,attrs) @obj.sax_tag_start(tag,attrs.is_a?(Array) ? Hash[*attrs.flatten(1)] : attrs) end
+							def end_element(tag) @obj.sax_tag_end(tag) end
+							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
+							def characters(txt) @obj.sax_text(txt) end
+							def cdata(txt) @obj.sax_cdata(txt) end
+							def comment(txt) @obj.sax_comment(txt) end
+						}
+						break
+					when :xmlparser
+						begin
+							require 'xml/saxdriver'
+						rescue LoadError;next end
+						@parser=e_module
+						@saxhelper=Class.new(XMLParser){
+							def __init__(obj)
+								@obj=obj
+								@cdata=false
+								self
+							end
+							def startElement(tag,attrs) @obj.sax_tag_start(tag,attrs) end
+							def endElement(tag) @obj.sax_tag_end(tag) end
+							def comment(txt) @obj.sax_comment(txt) end
+							def xmlDecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
+							def character(txt)
+								if @cdata
+									@obj.sax_cdata(txt)
+								else
+									@obj.sax_text(txt)
+								end
+							end
+							def startCdata
+								@cdata=true
+							end
+							def endCdata
+								@cdata=false
+							end
 						}
 						break
 					when :rexmlstream
@@ -86,7 +148,7 @@ module MultiSAX
 			return @parser
 		end
 		# Reset MultiSAX state so that you can re-open() another library.
-		def reset() @parser=nil;@saxmodule=nil end
+		def reset() @parser=nil end
 		# Returns which module is actually chosen.
 		def parser() @parser end
 
@@ -95,74 +157,17 @@ module MultiSAX
 		def method_mapping(listener)
 			#raise "MultiSAX::Sax open first" if !@parser
 			case @parser
-				when :ox,:oxhtml
-					saxmodule=@saxmodule
-					listener.instance_eval{
-						extend saxmodule
-						@saxwrapper_tag=nil
-						@saxwrapper_attr={}
-						def start_element(tag)
-							if @after_error
-								sax_tag_start(tag.to_s,{})
-								@after_error=false
-							else
-								# I hope provided Listener's sax_tag_start will NOT be used elsewhere.
-								#alias :attrs_done :attrs_done_normal
-								@saxwrapper_tag=tag
-								@saxwrapper_attr={}
-							end
-						end
-						# These "instance methods" are actually injected to listener class using instance_eval.
-						# i.e. not APIs. You cannot call these methods from outside.
-						def attr(name,str)
-							@saxwrapper_attr[name.to_s]=str
-						end
-						#--
-						#alias :attr_value :attr
-						#++
-						def attrs_done_xmldecl
-							sax_xmldecl(@saxwrapper_attr['version'],@saxwrapper_attr['encoding'],@saxwrapper_attr['standalone'])
-						end
-						def attrs_done_normal
-							sax_tag_start(@saxwrapper_tag.to_s,@saxwrapper_attr)
-						end
-						#alias :attrs_done :attrs_done_xmldecl
-						def attrs_done
-							@saxwrapper_tag ? attrs_done_normal : attrs_done_xmldecl
-						end
-						def error(s,i,j) @after_error=true if s.end_with?('closed but not opened') end
-						def end_element(tag) sax_tag_end(tag.to_s) end
-						alias :cdata :sax_cdata
-						alias :text :sax_text
-						#--
-						#alias :value :sax_text
-						#++
-						alias :comment :sax_comment
-					}
 				when :libxml
 					listener.instance_eval{
 						extend LibXML::XML::SaxParser::Callbacks
-						alias :on_start_element_ns :sax_start_element_namespace_libxml
-						#alias :on_start_element :sax_tag_start
-						alias :on_end_element_ns :sax_end_element_namespace
-						#alias :on_end_element :sax_tag_end
+						#alias :on_start_element_ns :sax_start_element_namespace_libxml
+						alias :on_start_element :sax_tag_start
+						#alias :on_end_element_ns :sax_end_element_namespace
+						alias :on_end_element :sax_tag_end
 						alias :on_cdata_block :sax_cdata
 						alias :on_characters :sax_text
 						alias :on_comment :sax_comment
 						#alias :xmldecl :sax_xmldecl
-					}
-				when :nokogiri,:nokogirihtml
-					saxmodule=@saxmodule
-					listener.instance_eval{
-						extend saxmodule
-						alias :start_element_namespace :sax_start_element_namespace_nokogiri
-						def start_element(tag,attrs) sax_tag_start(tag,attrs.is_a?(Array) ? Hash[*attrs.flatten(1)] : attrs) end
-						alias :end_element_namespace :sax_end_element_namespace
-						alias :end_element :sax_tag_end
-						alias :cdata_block :sax_cdata
-						alias :characters :sax_text
-						alias :comment :sax_comment
-						alias :xmldecl :sax_xmldecl
 					}
 				when :rexmlstream
 					listener.instance_eval{
@@ -203,21 +208,23 @@ module MultiSAX
 			method_mapping(@listener)
 			if source.is_a?(String)
 				case @parser
-					when :ox           then Ox.sax_parse(@listener,StringIO.new(source),:convert_special=>true)
-					when :oxhtml       then Ox.sax_parse(@listener,StringIO.new(source),:convert_special=>true,:smart=>true)
+					when :ox           then Ox.sax_parse(@saxhelper.new.__init__(@listener),StringIO.new(source),:convert_special=>true)
+					when :oxhtml       then Ox.sax_parse(@saxhelper.new.__init__(@listener),StringIO.new(source),:convert_special=>true,:smart=>true)
 					when :libxml       then parser=LibXML::XML::SaxParser.string(source);parser.callbacks=@listener;parser.parse
-					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(source)
-					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@listener);parser.parse(source)
+					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source)
+					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source)
+					when :xmlparser    then @saxhelper.new.__init__(@listener).parse(source)
 					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,@listener).parse
 					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
 				end
 			else
 				case @parser
-					when :ox           then Ox.sax_parse(@listener,source,:convert_special=>true)
-					when :oxhtml       then Ox.sax_parse(@listener,source,:convert_special=>true,:smart=>true)
+					when :ox           then Ox.sax_parse(@saxhelper.new.__init__(@listener),source,:convert_special=>true)
+					when :oxhtml       then Ox.sax_parse(@saxhelper.new.__init__(@listener),source,:convert_special=>true,:smart=>true)
 					when :libxml       then parser=LibXML::XML::SaxParser.io(source);parser.callbacks=@listener;parser.parse
-					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@listener);parser.parse(source)
-					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@listener);parser.parse(source.read) # fixme
+					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source)
+					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source.read) # fixme
+					when :xmlparser    then @saxhelper.new.__init__(@listener).parse(source)
 					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,@listener).parse
 					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
 				end
@@ -257,40 +264,6 @@ module MultiSAX
 	# MultiSAX callbacks.
 	# MultiSAX::SAX listener should include this module.
 	module Callbacks
-		# Cited from Nokogiri to convert Nokogiri::XML::SAX::Document into module.
-		#  https://github.com/sparklemotion/nokogiri/blob/master/lib/nokogiri/xml/sax/document.rb
-		def sax_start_element_namespace_nokogiri name, attrs = [], prefix = nil, uri = nil, ns = []
-			# Deal with SAX v1 interface
-			name = [prefix, name].compact.join(':')
-			# modified in 0.0.2
-			attributes = {}
-			ns.each{|ns_prefix,ns_uri|
-				attributes[['xmlns', ns_prefix].compact.join(':')]=ns_uri
-			}
-			attrs.each{|attr|
-				attributes[[attr.prefix, attr.localname].compact.join(':')]=attr.value
-			}
-			sax_tag_start name, attributes
-        end
-		# libxml namespace handler
-		def sax_start_element_namespace_libxml name, attrs, prefix = nil, uri = nil, ns = []
-			# Deal with SAX v1 interface
-			name = [prefix, name].compact.join(':')
-			# modified in 0.0.2
-			attributes = {}
-			ns.each{|ns_prefix,ns_uri|
-				attributes[['xmlns', ns_prefix].compact.join(':')]=ns_uri
-			}
-			attrs.each{|k,v|
-				attributes[k]=v
-			}
-			sax_tag_start name, attributes
-        end
-		# Cited from Nokogiri
-		def sax_end_element_namespace name, prefix = nil, uri = nil
-			# Deal with SAX v1 interface
-			sax_tag_end [prefix, name].compact.join(':')
-		end
 		# Start of tag
 		def sax_tag_start(tag,attrs) end
 		# End of tag

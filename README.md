@@ -25,6 +25,7 @@ A module which allows multiple SAX library transparently.
 * gem install ox
 * gem install libxml-ruby
 * gem install nokogiri
+* gem install xmlparser
 
 ## Usage
 * Please check spec/multisax.spec as an example.

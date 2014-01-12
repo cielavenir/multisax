@@ -15,6 +15,7 @@ group :test do
 	platforms :ruby do
 		gem 'libxml-ruby'
 		gem 'ox'
+		gem 'xmlparser'
 	end
 end
 

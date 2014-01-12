@@ -225,6 +225,7 @@ GEM
       multi_json
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
+    xmlparser (0.7.2.1)
 
 PLATFORMS
   ruby
@@ -239,3 +240,4 @@ DEPENDENCIES
   rspec
   rubysl
   simplecov
+  xmlparser

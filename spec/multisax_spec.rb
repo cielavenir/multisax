@@ -81,6 +81,15 @@ describe "[XML] MultiSAX::Sax.parse(String)" do
 		listener.attrib.should eq 'foo'
 		listener.xmlencoding.should eq 'UTF-8'
 	end
+	it "uses :xmlparser" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:xmlparser)
+		MultiSAX::Sax.parser.should eq :xmlparser
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		listener.xmlencoding.should eq 'UTF-8'
+	end
 end
 
 describe "[XML] MultiSAX::Sax.parse(IO)" do
@@ -124,6 +133,15 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:nokogiri)
 		MultiSAX::Sax.parser.should eq :nokogiri
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		listener.xmlencoding.should eq 'UTF-8'
+	end
+	it "uses :xmlparser" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:xmlparser)
+		MultiSAX::Sax.parser.should eq :xmlparser
 		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
 		listener.result.should eq xml_answer
 		listener.attrib.should eq 'foo'
