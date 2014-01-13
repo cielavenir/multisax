@@ -120,7 +120,7 @@ module MultiSAX
 							require 'xml/saxdriver'
 						rescue LoadError;next end
 						@parser=e_module
-						@saxhelper=Class.new(::XMLParser){
+						@saxhelper=Class.new(::XML::Parser){
 							def __init__(obj)
 								@obj=obj
 								@cdata=false
@@ -147,7 +147,7 @@ module MultiSAX
 						break
 					when :rexmlstream
 						begin
-							require 'rexml/document'
+							require 'rexml/parsers/baseparser'
 							require 'rexml/parsers/streamparser'
 							require 'rexml/streamlistener'
 						rescue LoadError;next end
@@ -168,7 +168,6 @@ module MultiSAX
 						break
 					when :rexmlsax2
 						begin
-							require 'rexml/document'
 							require 'rexml/parsers/sax2parser'
 							require 'rexml/sax2listener'
 						rescue LoadError;next end
