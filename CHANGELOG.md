@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.0.4 (2014 Jan 13)
+- Integrated travis. Now Ruby/Rubinius/jruby supports are assured.
+- Added xmlparser (expat bindings) gem support.
+
 ## 0.0.3 (2013 Nov 14)
 - Fixed namespace handling.
 - Now you can also select :oxhtml to parse HTML.

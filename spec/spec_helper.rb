@@ -4,7 +4,7 @@ RSpec.configure{|config|
 }
 
 require 'stringio'
-if RUBY_VERSION<'1.9' #gee, StringIO needs to be hacked.
+if RUBY_VERSION<'1.9' #gee, :rexmlsax2 on Ruby 1.8 dislikes StringIO.
 	class StringIO
 		def stat
 			Class.new{

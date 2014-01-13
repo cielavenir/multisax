@@ -19,6 +19,9 @@ A module which allows multiple SAX library transparently.
   * multisax_mini.rb:  :libxml/:rexmlstream/:rexmlsax2
   * multisax_mini2.rb: :libxml/:rexmlstream
 
+## Benchmark
+* https://gist.github.com/cielavenir/8398647
+
 ## Install
 * gem install multisax
 * Optional XML libraries:
@@ -26,6 +29,9 @@ A module which allows multiple SAX library transparently.
 * gem install libxml-ruby
 * gem install nokogiri
 * gem install xmlparser
+  * to treat cdata, I recommend expat 2.x.
+  * For example, OSX MacPorts users should:
+  * gem install xmlparser --with-expat-include=/opt/local/include --with-expat-lib=/opt/local/lib
 
 ## Usage
 * Please check spec/multisax.spec as an example.

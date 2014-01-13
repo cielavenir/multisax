@@ -8,25 +8,26 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.5'
+	VERSION='0.0.4'
 
 	# The class to handle XML libraries.
 	class SAX
 		# constructor
-		def initialize
+		def initialize(*list)
 			@parser=nil
+			open(*list)
 		end
 		# Library loader.
 		# Arguments are list (or Array) of libraries.
 		#  if list is empty or :XML, the following are searched (order by speed):
-		#  :ox, :libxml, :nokogiri, :xmlparser, :rexmlstream, :rexmlsax2
+		#  :ox, :libxml, :xmlparser, :nokogiri, :rexmlstream, :rexmlsax2
 		#  if list is :HTML, the following are searched (order by speed):
 		#  :oxhtml, :nokogirihtml
 		#  You can also specify libraries individually.
 		#  If multiple selected, MultiSAX will try the libraries one by one and use the first usable one.
 		def open(*list)
 			return @parser if @parser
-			list=[:ox,:libxml,:nokogiri,:xmlparser,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
+			list=[:ox,:libxml,:xmlparser,:nokogiri,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
 			list=[:oxhtml,:nokogirihtml] if list==[:HTML]
 			list.each{|e_module|
 				case e_module
@@ -36,7 +37,7 @@ module MultiSAX
 							require 'stringio' #this should be standard module.
 						rescue LoadError;next end
 						@parser=e_module
-						@saxhelper=Class.new(Ox::Sax){
+						@saxhelper=Class.new(::Ox::Sax){
 							def __init__(obj)
 								@obj=obj
 								@saxwrapper_tag=nil
@@ -78,7 +79,22 @@ module MultiSAX
 						begin
 							require 'libxml'
 						rescue LoadError;next end
-						@parser=e_module;break
+						@parser=e_module
+						@saxhelper=Class.new{
+							include ::LibXML::XML::SaxParser::Callbacks
+							def __init__(obj)
+								@obj=obj
+								self
+							end
+							def on_start_element(tag,attrs) @obj.sax_tag_start(tag,attrs) end
+							def on_end_element(tag) @obj.sax_tag_end(tag) end
+							def on_characters(txt) @obj.sax_text(txt) end
+							def on_cdata_block(txt) @obj.sax_cdata(txt) end
+							def on_comment(txt) @obj.sax_comment(txt) end
+							#actually unused
+							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
+						}
+						break
 					when :nokogiri,:nokogirihtml
 						#nokogiri 1.5.x are supported on Ruby 1.8.7.
 						#next if RUBY_VERSION<'1.9'
@@ -86,17 +102,17 @@ module MultiSAX
 							require 'nokogiri'
 						rescue LoadError;next end
 						@parser=e_module
-						@saxhelper=Class.new(Nokogiri::XML::SAX::Document){
+						@saxhelper=Class.new(::Nokogiri::XML::SAX::Document){
 							def __init__(obj)
 								@obj=obj
 								self
 							end
 							def start_element(tag,attrs) @obj.sax_tag_start(tag,attrs.is_a?(Array) ? Hash[*attrs.flatten(1)] : attrs) end
 							def end_element(tag) @obj.sax_tag_end(tag) end
-							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
 							def characters(txt) @obj.sax_text(txt) end
-							def cdata(txt) @obj.sax_cdata(txt) end
+							def cdata_block(txt) @obj.sax_cdata(txt) end
 							def comment(txt) @obj.sax_comment(txt) end
+							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
 						}
 						break
 					when :xmlparser
@@ -104,7 +120,7 @@ module MultiSAX
 							require 'xml/saxdriver'
 						rescue LoadError;next end
 						@parser=e_module
-						@saxhelper=Class.new(XMLParser){
+						@saxhelper=Class.new(::XMLParser){
 							def __init__(obj)
 								@obj=obj
 								@cdata=false
@@ -135,14 +151,42 @@ module MultiSAX
 							require 'rexml/parsers/streamparser'
 							require 'rexml/streamlistener'
 						rescue LoadError;next end
-						@parser=e_module;break
+						@parser=e_module
+						@saxhelper=Class.new{
+							include ::REXML::StreamListener
+							def __init__(obj)
+								@obj=obj
+								self
+							end
+							def tag_start(tag,attrs) @obj.sax_tag_start(tag,attrs) end
+							def tag_end(tag) @obj.sax_tag_end(tag) end
+							def text(txt) @obj.sax_text(txt) end
+							def cdata(txt) @obj.sax_cdata(txt) end
+							def comment(txt) @obj.sax_comment(txt) end
+							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
+						}
+						break
 					when :rexmlsax2
 						begin
 							require 'rexml/document'
 							require 'rexml/parsers/sax2parser'
 							require 'rexml/sax2listener'
 						rescue LoadError;next end
-						@parser=e_module;break
+						@parser=e_module
+						@saxhelper=Class.new{
+							include ::REXML::SAX2Listener
+							def __init__(obj)
+								@obj=obj
+								self
+							end
+							def start_element(uri,tag,qname,attrs) @obj.sax_tag_start(qname,attrs) end
+							def end_element(uri,tag,qname) @obj.sax_tag_end(qname) end
+							def characters(txt) @obj.sax_text(txt) end
+							def cdata(txt) @obj.sax_cdata(txt) end
+							def comment(txt) @obj.sax_comment(txt) end
+							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
+						}
+						break
 				end
 			}
 			return @parser
@@ -152,48 +196,6 @@ module MultiSAX
 		# Returns which module is actually chosen.
 		def parser() @parser end
 
-		private
-		#(private) Patches listener to accept library-specific APIs.
-		def method_mapping(listener)
-			#raise "MultiSAX::Sax open first" if !@parser
-			case @parser
-				when :libxml
-					listener.instance_eval{
-						extend LibXML::XML::SaxParser::Callbacks
-						#alias :on_start_element_ns :sax_start_element_namespace_libxml
-						alias :on_start_element :sax_tag_start
-						#alias :on_end_element_ns :sax_end_element_namespace
-						alias :on_end_element :sax_tag_end
-						alias :on_cdata_block :sax_cdata
-						alias :on_characters :sax_text
-						alias :on_comment :sax_comment
-						#alias :xmldecl :sax_xmldecl
-					}
-				when :rexmlstream
-					listener.instance_eval{
-						extend REXML::StreamListener
-						alias :tag_start :sax_tag_start
-						alias :tag_end :sax_tag_end
-						alias :cdata :sax_cdata
-						alias :text :sax_text
-						alias :comment :sax_comment
-						alias :xmldecl :sax_xmldecl
-					}
-				when :rexmlsax2
-					listener.instance_eval{
-						extend REXML::SAX2Listener
-						def start_element(uri,tag,qname,attrs) sax_tag_start(qname,attrs) end
-						def end_element(uri,tag,qname) sax_tag_end(qname) end
-						alias :cdata :sax_cdata
-						alias :characters :sax_text
-						alias :comment :sax_comment
-						alias :xmldecl :sax_xmldecl
-					}
-			end
-			listener
-		end
-
-		public
 		# The main parsing method.
 		# Listener can be Class.new{include MultiSAX::Callbacks}.new. Returns the listener after SAX is applied.
 		# If you have not called open(), this will call it using default value (all libraries).
@@ -204,32 +206,31 @@ module MultiSAX
 			if !@parser && !open
 				raise "Failed to open SAX library. REXML, which is a standard Ruby module, might be also corrupted."
 			end
-			@listener=listener
-			method_mapping(@listener)
+			saxhelper=@saxhelper.new.__init__(listener)
 			if source.is_a?(String)
 				case @parser
-					when :ox           then Ox.sax_parse(@saxhelper.new.__init__(@listener),StringIO.new(source),:convert_special=>true)
-					when :oxhtml       then Ox.sax_parse(@saxhelper.new.__init__(@listener),StringIO.new(source),:convert_special=>true,:smart=>true)
-					when :libxml       then parser=LibXML::XML::SaxParser.string(source);parser.callbacks=@listener;parser.parse
-					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source)
-					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source)
-					when :xmlparser    then @saxhelper.new.__init__(@listener).parse(source)
-					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,@listener).parse
-					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
+					when :ox           then Ox.sax_parse(saxhelper,StringIO.new(source),:convert_special=>true)
+					when :oxhtml       then Ox.sax_parse(saxhelper,StringIO.new(source),:convert_special=>true,:smart=>true)
+					when :libxml       then parser=LibXML::XML::SaxParser.string(source);parser.callbacks=saxhelper;parser.parse
+					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(saxhelper);parser.parse(source)
+					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(saxhelper);parser.parse(source)
+					when :xmlparser    then saxhelper.parse(source)
+					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,saxhelper).parse
+					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(saxhelper);parser.parse
 				end
 			else
 				case @parser
-					when :ox           then Ox.sax_parse(@saxhelper.new.__init__(@listener),source,:convert_special=>true)
-					when :oxhtml       then Ox.sax_parse(@saxhelper.new.__init__(@listener),source,:convert_special=>true,:smart=>true)
-					when :libxml       then parser=LibXML::XML::SaxParser.io(source);parser.callbacks=@listener;parser.parse
-					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source)
-					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(@saxhelper.new.__init__(@listener));parser.parse(source.read) # fixme
-					when :xmlparser    then @saxhelper.new.__init__(@listener).parse(source)
-					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,@listener).parse
-					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(@listener);parser.parse
+					when :ox           then Ox.sax_parse(saxhelper,source,:convert_special=>true)
+					when :oxhtml       then Ox.sax_parse(saxhelper,source,:convert_special=>true,:smart=>true)
+					when :libxml       then parser=LibXML::XML::SaxParser.io(source);parser.callbacks=saxhelper;parser.parse
+					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(saxhelper);parser.parse(source)
+					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(saxhelper);parser.parse(source.read) # fixme: nokogirihtml IO doesn't allow errors.
+					when :xmlparser    then saxhelper.parse(source)
+					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,saxhelper).parse
+					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(saxhelper);parser.parse
 				end
 			end
-			@listener
+			listener
 		end
 
 		# Parses file as XML. Error handling might be changed in the future.

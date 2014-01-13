@@ -17,6 +17,10 @@ class MultiSAXTester
 		text.strip!
 		@result<<text if text.size>0
 	end
+	def sax_cdata(text)
+		text.strip!
+		@result<<text if text.size>0
+	end
 	def sax_xmldecl(version,encoding,standalone)
 		@xmlencoding=encoding
 	end
@@ -26,10 +30,10 @@ end
 input_xml=<<"EOM"
 <?xml version="1.0" encoding="UTF-8"?>
 <ns xmlns:zzz="http://example.com/">
-<zzz:hello><span class="foo">world</span></zzz:hello>
+<zzz:hello><![CDATA[sax$]]><span class="foo">world</span></zzz:hello>
 </ns>
 EOM
-xml_answer=['ns','zzz:hello','span','world','span','zzz:hello','ns']
+xml_answer=['ns','zzz:hello','sax$','span','world','span','zzz:hello','ns']
 
 describe "[XML] MultiSAX::Sax.parse(String)" do
 	it "fails on :unknown" do
