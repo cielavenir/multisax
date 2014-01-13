@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 0.0.4.1 (2014 Jan 14)
+- Fixed small stuff.
+
 ## 0.0.4 (2014 Jan 13)
 - Integrated travis. Now Ruby/Rubinius/jruby supports are assured.
 - Added xmlparser (expat bindings) gem support.

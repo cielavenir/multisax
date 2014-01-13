@@ -8,14 +8,14 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.4'
+	VERSION='0.0.4.1'
 
 	# The class to handle XML libraries.
 	class SAX
-		# constructor
-		def initialize(*list)
+		# constructor.
+		# list cannot be passed directly, since you should the retval of open().
+		def initialize
 			@parser=nil
-			open(*list)
 		end
 		# Library loader.
 		# Arguments are list (or Array) of libraries.
