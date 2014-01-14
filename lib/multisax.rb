@@ -13,7 +13,7 @@ module MultiSAX
 	# The class to handle XML libraries.
 	class SAX
 		# constructor.
-		# list cannot be passed directly, since you should the retval of open().
+		# list cannot be passed directly, since you should check the retval of open().
 		def initialize
 			@parser=nil
 		end
