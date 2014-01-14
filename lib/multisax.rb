@@ -8,7 +8,7 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.4.1'
+	VERSION='0.0.4.2'
 
 	# The class to handle XML libraries.
 	class SAX
@@ -237,12 +237,11 @@ module MultiSAX
 			#begin
 				return nil unless FileTest::readable?(filename)
 				File.open(filename,'rb'){|f|
-					parse(f,listener)
+					return parse(f,listener)
 				}
 			#rescue
 			#	return nil
 			#end
-			@listener
 		end
 	end
 

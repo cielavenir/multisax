@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 0.0.4.2 (2014 Jan 14)
+- Fixed regression in parsefile().
+
 ## 0.0.4.1 (2014 Jan 14)
 - Fixed small stuff.
 
