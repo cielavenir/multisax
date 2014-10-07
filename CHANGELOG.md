@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.0.5 (2014 Oct 7)
+- Added oga gem support (Ruby 1.9.x or later required).
+- Integrated Coverall.
+
 ## 0.0.4.2 (2014 Jan 14)
 - Fixed regression in parsefile().
 

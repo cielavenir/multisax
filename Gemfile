@@ -5,13 +5,13 @@ platforms :rbx do
 	gem 'racc' # nokogiri
 end
 
-#This clause is broken. So, please do not use bundle install if you are not developing multisax.
 group :test do
-	#if RUBY_VERSION>='1.9'
-	#	gem 'nokogiri'
-	#else
+	if RUBY_VERSION>='1.9'
+		gem 'nokogiri', '~> 1.6.0' # Used workaround here; actually 1.7.x should also be OK...
+		gem 'oga'
+	else
 		gem 'nokogiri', '~> 1.5.0'
-	#end
+	end
 	platforms :ruby do
 		gem 'libxml-ruby'
 		gem 'ox'
@@ -24,4 +24,5 @@ group :development, :test do
 	gem 'rake'
 	gem 'rspec'
 	gem 'simplecov'
+	gem 'coveralls', :require => false
 end

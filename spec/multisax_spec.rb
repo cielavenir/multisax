@@ -38,7 +38,7 @@ xml_answer=['ns','zzz:hello','sax$','span','world','span','zzz:hello','ns']
 describe "[XML] MultiSAX::Sax.parse(String)" do
 	it "fails on :unknown" do
 		MultiSAX::Sax.reset
-		MultiSAX::Sax.open(:unknown).should be_false
+		MultiSAX::Sax.open(:unknown).should be_falsey
 	end
 	it "uses :rexmlstream" do
 		MultiSAX::Sax.reset
@@ -82,6 +82,15 @@ describe "[XML] MultiSAX::Sax.parse(String)" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:nokogiri)
 		MultiSAX::Sax.parser.should eq :nokogiri
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		listener.xmlencoding.should eq 'UTF-8'
+	end
+	it "uses :oga" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:oga)
+		MultiSAX::Sax.parser.should eq :oga
 		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
 		listener.result.should eq xml_answer
 		listener.attrib.should eq 'foo'
@@ -148,6 +157,15 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 		listener.attrib.should eq 'foo'
 		listener.xmlencoding.should eq 'UTF-8'
 	end
+	it "uses :oga" do
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:oga)
+		MultiSAX::Sax.parser.should eq :oga
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		listener.xmlencoding.should eq 'UTF-8'
+	end
 	it "uses :xmlparser" do
 		pending 'xmlparser is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
 		pending 'xmlparser is not supported by rubinius' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='rbx'
@@ -191,6 +209,15 @@ describe "[HTML] MultiSAX::Sax.parse(String)" do
 		listener.result.should eq html_answer
 		listener.attrib.should eq 'foo'
 	end
+	it "uses :ogahtml" do
+		pending 'oga does not like broken HTML'
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:ogahtml)
+		MultiSAX::Sax.parser.should eq :ogahtml
+		listener=MultiSAX::Sax.parse(input_html,MultiSAXTester.new)
+		listener.result.should eq html_answer
+		listener.attrib.should eq 'foo'
+	end
 end
 
 describe "[HTML] MultiSAX::Sax.parse(IO)" do
@@ -207,6 +234,15 @@ describe "[HTML] MultiSAX::Sax.parse(IO)" do
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:nokogirihtml)
 		MultiSAX::Sax.parser.should eq :nokogirihtml
+		listener=MultiSAX::Sax.parse(StringIO.new(input_html),MultiSAXTester.new)
+		listener.result.should eq html_answer
+		listener.attrib.should eq 'foo'
+	end
+	it "uses :ogahtml" do
+		pending 'oga does not like broken HTML'
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:ogahtml)
+		MultiSAX::Sax.parser.should eq :ogahtml
 		listener=MultiSAX::Sax.parse(StringIO.new(input_html),MultiSAXTester.new)
 		listener.result.should eq html_answer
 		listener.attrib.should eq 'foo'

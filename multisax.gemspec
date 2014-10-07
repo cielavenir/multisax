@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.version       = MultiSAX::VERSION
   spec.authors       = ["cielavenir"]
   spec.email         = ["cielartisan@gmail.com"]
-  spec.description   = "Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/xmlparser(expat)/rexml"
+  spec.description   = "Ruby Gem to handle multiple SAX libraries: ox/libxml/nokogiri/oga/xmlparser(expat)/rexml"
   spec.summary       = "Ruby Gem to handle multiple SAX libraries"
   spec.homepage      = "http://github.com/cielavenir/multisax"
   spec.license       = "Ruby License (2-clause BSDL or Artistic)"
@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", ">= 1.0"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
-  spec.requirements << "Optional dependencies: libxml-ruby, nokogiri, ox, xmlparser"
+  spec.requirements << "Optional dependencies: ox, libxml-ruby, nokogiri, oga, xmlparser"
 end

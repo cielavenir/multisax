@@ -1,6 +1,6 @@
 # MultiSAX: Ruby Gem to handle multiple SAX libraries
 #
-# Copyright (c) 2013, T. Yamada under Ruby License (2-clause BSDL or Artistic).
+# Copyright (c) 2014, T. Yamada under Ruby License (2-clause BSDL or Artistic).
 #
 # Check LICENSE terms.
 #
@@ -8,7 +8,7 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.4.2'
+	VERSION='0.0.5'
 
 	# The class to handle XML libraries.
 	class SAX
@@ -27,8 +27,8 @@ module MultiSAX
 		#  If multiple selected, MultiSAX will try the libraries one by one and use the first usable one.
 		def open(*list)
 			return @parser if @parser
-			list=[:ox,:libxml,:xmlparser,:nokogiri,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
-			list=[:oxhtml,:nokogirihtml] if list==[:HTML]
+			list=[:ox,:libxml,:xmlparser,:nokogiri,:oga,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
+			list=[:oxhtml,:nokogirihtml,:ogahtml] if list==[:HTML]
 			list.each{|e_module|
 				case e_module
 					when :ox,:oxhtml
@@ -113,6 +113,36 @@ module MultiSAX
 							def cdata_block(txt) @obj.sax_cdata(txt) end
 							def comment(txt) @obj.sax_comment(txt) end
 							def xmldecl(version,encoding,standalone) @obj.sax_xmldecl(version,encoding,standalone) end
+						}
+						break
+					when :oga,:ogahtml
+						next if RUBY_VERSION<'1.9'
+						begin
+							require 'oga'
+						rescue LoadError;next end
+						@parser=e_module
+						@saxhelper=Class.new{
+							def __init__(obj)
+								@obj=obj
+								@stack=[]
+								self
+							end
+							def on_element(ns,tag,attrs)
+								tag_name=(ns ? (ns+':') : '')+tag
+								@stack.push(tag_name)
+								@obj.sax_tag_start(tag_name,Hash[*attrs.map{|e|[e.name,e.value]}.flatten(1)])
+								return tag_name
+							end
+							def after_element(reserved)
+								@obj.sax_tag_end(@stack.pop)
+							end
+							def on_text(txt) @obj.sax_text(txt) end
+							def on_cdata(txt) @obj.sax_cdata(txt) end
+							def on_comment(txt) @obj.sax_comment(txt) end
+							def on_xml_decl(args)
+								attrs=Hash[*args.map{|e|[e.name,e.value]}.flatten(1)]
+								@obj.sax_xmldecl(attrs['version'],attrs['encoding'],attrs['standalone'])
+							end
 						}
 						break
 					when :xmlparser
@@ -213,6 +243,8 @@ module MultiSAX
 					when :libxml       then parser=LibXML::XML::SaxParser.string(source);parser.callbacks=saxhelper;parser.parse
 					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(saxhelper);parser.parse(source)
 					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(saxhelper);parser.parse(source)
+					when :oga          then parser=Oga::XML::SaxParser.new(saxhelper,source);parser.parse
+					when :ogahtml      then parser=Oga::HTML::SaxParser.new(saxhelper,source);parser.parse
 					when :xmlparser    then saxhelper.parse(source)
 					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,saxhelper).parse
 					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(saxhelper);parser.parse
@@ -224,6 +256,8 @@ module MultiSAX
 					when :libxml       then parser=LibXML::XML::SaxParser.io(source);parser.callbacks=saxhelper;parser.parse
 					when :nokogiri     then parser=Nokogiri::XML::SAX::Parser.new(saxhelper);parser.parse(source)
 					when :nokogirihtml then parser=Nokogiri::HTML::SAX::Parser.new(saxhelper);parser.parse(source.read) # fixme: nokogirihtml IO doesn't allow errors.
+					when :oga          then parser=Oga::XML::SaxParser.new(saxhelper,source);parser.parse
+					when :ogahtml      then parser=Oga::HTML::SaxParser.new(saxhelper,source);parser.parse
 					when :xmlparser    then saxhelper.parse(source)
 					when :rexmlstream  then REXML::Parsers::StreamParser.new(source,saxhelper).parse
 					when :rexmlsax2    then parser=REXML::Parsers::SAX2Parser.new(source);parser.listen(saxhelper);parser.parse
