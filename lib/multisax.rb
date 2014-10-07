@@ -8,7 +8,7 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.5'
+	VERSION='0.0.5.1'
 
 	# The class to handle XML libraries.
 	class SAX

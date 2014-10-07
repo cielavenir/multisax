@@ -1,4 +1,4 @@
-- Copyright (c) 2013, T. Yamada
+- Copyright (c) 2014, T. Yamada
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met: 
@@ -24,6 +24,12 @@ Note: MultiSAX shouldn't load any copyleft libraries.
 
 - Ruby (REXML): 2-clause BSD License (or Artistic License)
 - Nokogiri: MIT License
+  - Aaron Patterson, Mike Dalessio, Charles Nutter, Sergio Arbeo, Patrick Mahoney, Yoko Harada, Akinori MUSHA
 - libxml-ruby: MIT License
+  - Ross Bamform, Wai-Sun Chia, Sean Chittenden, Dan Janwoski, Anurag Priyam, Charlie Savage, Ryan Johnson
 - Ox: 3-clause BSD License
+  - Peter Ohler
 - xmlparser: MIT License
+  - Masato Yoshida
+- Oga: MIT License
+  - Yorick Peterse
