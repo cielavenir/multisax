@@ -20,14 +20,14 @@ module MultiSAX
 		# Library loader.
 		# Arguments are list (or Array) of libraries.
 		#  if list is empty or :XML, the following are searched (order by speed):
-		#  :ox, :libxml, :xmlparser, :nokogiri, :rexmlstream, :rexmlsax2
+		#  :ox, :libxml, :xmlparser, :nokogiri, :oga, :rexmlstream, :rexmlsax2
 		#  if list is :HTML, the following are searched (order by speed):
-		#  :oxhtml, :nokogirihtml
+		#  :oxhtml, :nokogirihtml, :ogahtml
 		#  You can also specify libraries individually.
 		#  If multiple selected, MultiSAX will try the libraries one by one and use the first usable one.
 		def open(*list)
 			return @parser if @parser
-			list=[:ox,:libxml,:xmlparser,:nokogiri,:oga,:rexmlstream,:rexmlsax2] if list.size==0||list==[:XML]
+			list=[:ox,:libxml,:xmlparser,:nokogiri,:oga,:rexmlstream,:rexmlsax2] if list.empty?||list==[:XML]
 			list=[:oxhtml,:nokogirihtml,:ogahtml] if list==[:HTML]
 			list.each{|e_module|
 				case e_module
