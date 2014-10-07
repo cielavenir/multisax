@@ -88,6 +88,7 @@ describe "[XML] MultiSAX::Sax.parse(String)" do
 		listener.xmlencoding.should eq 'UTF-8'
 	end
 	it "uses :oga" do
+		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:oga)
 		MultiSAX::Sax.parser.should eq :oga
@@ -158,6 +159,7 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 		listener.xmlencoding.should eq 'UTF-8'
 	end
 	it "uses :oga" do
+		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:oga)
 		MultiSAX::Sax.parser.should eq :oga
@@ -210,6 +212,7 @@ describe "[HTML] MultiSAX::Sax.parse(String)" do
 		listener.attrib.should eq 'foo'
 	end
 	it "uses :ogahtml" do
+		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
 		pending 'oga does not like broken HTML'
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ogahtml)
@@ -239,6 +242,7 @@ describe "[HTML] MultiSAX::Sax.parse(IO)" do
 		listener.attrib.should eq 'foo'
 	end
 	it "uses :ogahtml" do
+		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
 		pending 'oga does not like broken HTML'
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ogahtml)
