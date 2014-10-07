@@ -8,9 +8,11 @@ end
 group :test do
 	if RUBY_VERSION>='1.9'
 		gem 'nokogiri', '~> 1.6.0' # Used workaround here; actually 1.7.x should also be OK...
-		gem 'oga'
 	else
 		gem 'nokogiri', '~> 1.5.0'
+	end
+	if RUBY_VERSION>='1.9.3'
+		gem 'oga'
 	end
 	platforms :ruby do
 		gem 'libxml-ruby'
