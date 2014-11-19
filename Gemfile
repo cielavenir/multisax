@@ -12,7 +12,7 @@ group :test do
 		gem 'nokogiri', '~> 1.5.0'
 	end
 	if RUBY_VERSION>='1.9.3'
-		gem 'oga'
+		gem 'oga', '>= 0.2.0'
 	end
 	platforms :ruby do
 		gem 'libxml-ruby'

@@ -33,6 +33,7 @@ A module which allows multiple SAX library transparently.
   * to treat cdata, I recommend expat 2.x.
   * For example, OSX MacPorts users should:
   * gem install xmlparser -- --with-expat-include=/opt/local/include --with-expat-lib=/opt/local/lib
+* gem install oga
 
 ## Usage
 * Please check spec/multisax.spec as an example.

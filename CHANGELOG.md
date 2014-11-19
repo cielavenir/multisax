@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 0.0.6 (2014 Nov 19)
+- Now supports oga >= 0.2.0.
+
 ## 0.0.5 (2014 Oct 7)
 - Added oga gem support (Ruby 1.9.x or later required).
 - Integrated Coverall.

@@ -8,7 +8,7 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.5.1'
+	VERSION='0.0.6'
 
 	# The class to handle XML libraries.
 	class SAX
@@ -124,17 +124,16 @@ module MultiSAX
 						@saxhelper=Class.new{
 							def __init__(obj)
 								@obj=obj
-								@stack=[]
 								self
 							end
 							def on_element(ns,tag,attrs)
 								tag_name=(ns ? (ns+':') : '')+tag
-								@stack.push(tag_name)
 								@obj.sax_tag_start(tag_name,Hash[*attrs.map{|e|[e.name,e.value]}.flatten(1)])
 								return tag_name
 							end
-							def after_element(reserved)
-								@obj.sax_tag_end(@stack.pop)
+							def after_element(ns,tag)
+								tag_name=(ns ? (ns+':') : '')+tag
+								@obj.sax_tag_end(tag_name)
 							end
 							def on_text(txt) @obj.sax_text(txt) end
 							def on_cdata(txt) @obj.sax_cdata(txt) end
