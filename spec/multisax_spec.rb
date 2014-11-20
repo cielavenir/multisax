@@ -87,16 +87,6 @@ describe "[XML] MultiSAX::Sax.parse(String)" do
 		listener.attrib.should eq 'foo'
 		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it "uses :oga" do
-		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
-		MultiSAX::Sax.reset
-		MultiSAX::Sax.open(:oga)
-		MultiSAX::Sax.parser.should eq :oga
-		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
-		listener.result.should eq xml_answer
-		listener.attrib.should eq 'foo'
-		listener.xmlencoding.should eq 'UTF-8'
-	end
 	it "uses :xmlparser" do
 		pending 'xmlparser is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
 		pending 'xmlparser is not supported by rubinius' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='rbx'
@@ -107,6 +97,27 @@ describe "[XML] MultiSAX::Sax.parse(String)" do
 		listener.result.should eq xml_answer
 		listener.attrib.should eq 'foo'
 		listener.xmlencoding.should eq 'UTF-8'
+	end
+	it "uses :oga" do
+		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:oga)
+		MultiSAX::Sax.parser.should eq :oga
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		listener.xmlencoding.should eq 'UTF-8'
+	end
+	it "uses :xerces" do
+		pending 'xerces is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
+		pending 'xerces will not be supported officially'
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:xerces)
+		MultiSAX::Sax.parser.should eq :xerces
+		listener=MultiSAX::Sax.parse(input_xml,MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		#listener.xmlencoding.should eq 'UTF-8'
 	end
 end
 
@@ -158,16 +169,6 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 		listener.attrib.should eq 'foo'
 		listener.xmlencoding.should eq 'UTF-8'
 	end
-	it "uses :oga" do
-		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
-		MultiSAX::Sax.reset
-		MultiSAX::Sax.open(:oga)
-		MultiSAX::Sax.parser.should eq :oga
-		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
-		listener.result.should eq xml_answer
-		listener.attrib.should eq 'foo'
-		listener.xmlencoding.should eq 'UTF-8'
-	end
 	it "uses :xmlparser" do
 		pending 'xmlparser is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
 		pending 'xmlparser is not supported by rubinius' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='rbx'
@@ -178,6 +179,27 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 		listener.result.should eq xml_answer
 		listener.attrib.should eq 'foo'
 		listener.xmlencoding.should eq 'UTF-8'
+	end
+	it "uses :oga" do
+		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:oga)
+		MultiSAX::Sax.parser.should eq :oga
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		listener.xmlencoding.should eq 'UTF-8'
+	end
+	it "uses :xerces" do
+		pending 'xerces is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
+		pending 'xerces will not be supported officially'
+		MultiSAX::Sax.reset
+		MultiSAX::Sax.open(:xerces)
+		MultiSAX::Sax.parser.should eq :xerces
+		listener=MultiSAX::Sax.parse(StringIO.new(input_xml),MultiSAXTester.new)
+		listener.result.should eq xml_answer
+		listener.attrib.should eq 'foo'
+		#listener.xmlencoding.should eq 'UTF-8'
 	end
 end
 
