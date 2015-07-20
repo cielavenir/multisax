@@ -183,6 +183,7 @@ module MultiSAX
 							end
 						}
 						break
+					# :nocov:
 					when :xerces
 						begin
 							require 'Xerces'
@@ -214,6 +215,7 @@ module MultiSAX
 							#end
 						}
 						break
+					# :nocov:
 					when :rexmlstream
 						begin
 							require 'rexml/parsers/baseparser'
