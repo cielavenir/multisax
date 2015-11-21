@@ -26,3 +26,5 @@ Here is the instruction to activate Xerces-Ruby.
 - Now you can `require 'Xerces'` in your Ruby script.
 
 - Please note currently Xerces-Ruby cannot distinguish cdata and text, so both sax_cdata and sax_text are called. I (ciel) am NOT going to fix it.
+
+- coverall.io includes :nocov: region as missing, resulting in low coverage, meh...

@@ -1,5 +1,8 @@
 # ChangeLog
 
+## 0.0.7 (2015)
+- Update oga wrapper.
+
 ## 0.0.6 (2014 Nov 19)
 - Now supports oga >= 0.2.0.
 

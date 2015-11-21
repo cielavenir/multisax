@@ -8,7 +8,7 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.6.1'
+	VERSION='0.0.7'
 
 	# Default XML parsers
 	XML_PARSERS_DEFAULT=[:rexmlstream,:rexmlsax2]
@@ -167,7 +167,7 @@ module MultiSAX
 							end
 							def on_element(ns,tag,attrs)
 								tag_name=(ns ? (ns+':') : '')+tag
-								@obj.sax_tag_start(tag_name,Hash[*attrs.map{|e|[e.name,e.value]}.flatten(1)])
+								@obj.sax_tag_start(tag_name,Hash[*attrs.flatten(1)])
 								return tag_name
 							end
 							def after_element(ns,tag)
@@ -178,7 +178,7 @@ module MultiSAX
 							def on_cdata(txt) @obj.sax_cdata(txt) end
 							def on_comment(txt) @obj.sax_comment(txt) end
 							def on_xml_decl(args)
-								attrs=Hash[*args.map{|e|[e.name,e.value]}.flatten(1)]
+								attrs=Hash[*args.flatten(1)]
 								@obj.sax_xmldecl(attrs['version'],attrs['encoding'],attrs['standalone'])
 							end
 						}

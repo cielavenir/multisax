@@ -3,6 +3,8 @@ A module which allows multiple SAX library transparently.
 
 [![Build Status](https://travis-ci.org/cielavenir/multisax.png)](https://travis-ci.org/cielavenir/multisax) [![Code Climate](https://codeclimate.com/github/cielavenir/multisax.png)](https://codeclimate.com/github/cielavenir/multisax) [![Coverage Status](https://coveralls.io/repos/cielavenir/multisax/badge.png)](https://coveralls.io/r/cielavenir/multisax)
 
+[Why the coverage is so low?](Xerces.md)
+
 ## Supported Ruby versions
 * Ruby 1.8.7 or later
 * jruby

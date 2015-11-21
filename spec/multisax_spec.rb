@@ -235,7 +235,6 @@ describe "[HTML] MultiSAX::Sax.parse(String)" do
 	end
 	it "uses :ogahtml" do
 		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
-		pending 'oga does not like broken HTML'
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ogahtml)
 		MultiSAX::Sax.parser.should eq :ogahtml
@@ -265,7 +264,6 @@ describe "[HTML] MultiSAX::Sax.parse(IO)" do
 	end
 	it "uses :ogahtml" do
 		pending 'oga requires Ruby >=1.9.3' if RUBY_VERSION<'1.9.3'
-		pending 'oga does not like broken HTML'
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ogahtml)
 		MultiSAX::Sax.parser.should eq :ogahtml
