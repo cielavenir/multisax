@@ -14,7 +14,6 @@ rvm:
   - jruby-19mode
   - jruby-20mode
   - jruby-21mode
-  - jruby-22mode
   - jruby-head
   - rbx-2
 matrix:
@@ -25,5 +24,4 @@ matrix:
     - rvm: jruby-19mode
     - rvm: jruby-20mode
     - rvm: jruby-21mode
-    - rvm: jruby-22mode
     - rvm: rbx-2
