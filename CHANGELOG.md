@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 0.0.7 (2015)
+## 0.0.7 (2015 Nov 24)
 - Update oga wrapper.
 
 ## 0.0.6 (2014 Nov 19)
