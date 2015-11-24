@@ -8,7 +8,7 @@
 
 module MultiSAX
 	# VERSION string
-	VERSION='0.0.7'
+	VERSION='0.0.7.1'
 
 	# Default XML parsers
 	XML_PARSERS_DEFAULT=[:rexmlstream,:rexmlsax2]
