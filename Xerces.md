@@ -7,14 +7,18 @@ Due to license issue, in multisax, you need to `MultiSAX::Sax.open(:xerces)` or 
 Here is the instruction to activate Xerces-Ruby.
 
 ----
-- Install Xerces-C 2
-  - OSX (MacPorts): `sudo port install xercesc`
-  - Debian: `sudo apt-get install libxerces-c2-dev`
+- Install Xerces-C
+  - OSX
+      - MacPorts: `sudo port install xercesc`
+      - Homebrew: `brew install xerces-c`
+  - Debian: `sudo apt-get install libxerces-c-dev`
 - Download and extract [xerces-ruby](http://www.geocities.co.jp/SiliconValley-SanJose/9156/xerces-ruby.html)
 - Download [xerces-ruby.patch](https://gist.github.com/cielavenir/8401975)
 - Convert SAXParse.cpp's charcode
   - `cd /path/to/xerces-ruby/`
-  - `nkf -i -w SAXParse.cpp`
+  - `nkf --in-place -w SAXParse.cpp`
+  - `nkf --in-place -w RubyDocumentHandler.cpp`
+  - `nkf --in-place -w RubyDocumentHandler.hpp`
 - Apply patch
   - `patch < xerces-ruby.patch`
 - Run extconf.rb
