@@ -60,7 +60,6 @@ describe "[XML] MultiSAX::Sax.parse(String)" do
 	end
 	it "uses :ox" do
 		pending 'ox is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
-		pending 'ox looks broken on Ruby <1.9' if RUBY_VERSION<'1.9' ###
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ox)
 		MultiSAX::Sax.parser.should eq :ox
@@ -143,7 +142,6 @@ describe "[XML] MultiSAX::Sax.parse(IO)" do
 	end
 	it "uses :ox" do
 		pending 'ox is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
-		pending 'ox looks broken on Ruby <1.9' if RUBY_VERSION<'1.9' ###
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:ox)
 		MultiSAX::Sax.parser.should eq :ox
@@ -220,7 +218,6 @@ html_answer=['html','head','head','body','span','hello','span','body','html']
 describe "[HTML] MultiSAX::Sax.parse(String)" do
 	it "uses :oxhtml" do
 		pending 'ox is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
-		pending 'ox looks broken on Ruby <1.9' if RUBY_VERSION<'1.9' ###
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:oxhtml)
 		MultiSAX::Sax.parser.should eq :oxhtml
@@ -250,7 +247,6 @@ end
 describe "[HTML] MultiSAX::Sax.parse(IO)" do
 	it "uses :oxhtml" do
 		pending 'ox is not supported by jruby' if defined?(RUBY_ENGINE)&&RUBY_ENGINE=='jruby'
-		pending 'ox looks broken on Ruby <1.9' if RUBY_VERSION<'1.9' ###
 		MultiSAX::Sax.reset
 		MultiSAX::Sax.open(:oxhtml)
 		MultiSAX::Sax.parser.should eq :oxhtml
