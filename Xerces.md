@@ -13,6 +13,7 @@ Here is the instruction to activate Xerces-Ruby.
       - Homebrew: `brew install xerces-c`
   - Debian: `sudo apt-get install libxerces-c-dev`
 - Download and extract [xerces-ruby](http://www.geocities.co.jp/SiliconValley-SanJose/9156/xerces-ruby.html)
+  - After Geocities is gone, use mirror http://www.mediafire.com/file/p6vwaqca1eys1yg/xerces-ruby_0_01.tar.gz
 - Download [xerces-ruby.patch](https://gist.github.com/cielavenir/8401975)
 - Convert SAXParse.cpp's charcode
   - `cd /path/to/xerces-ruby/`
